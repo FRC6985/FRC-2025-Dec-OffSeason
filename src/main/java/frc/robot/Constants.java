@@ -22,7 +22,11 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
-  public static final class CanIds {}
+  public static final class CanIds {
+    public static final int IntakeCenteringMotor = 0;
+    public static final int IntakeRollerMotor = 0;
+    public static final int IntakePivotMotor = 0;
+  }
 
   public static final class Field {
     public static final double FIELD_X_SIZE = 17.548249;
@@ -41,21 +45,89 @@ public final class Constants {
     public static final String BackLeftName = "Back Left";
 
     // Camera poses
-    public static final Transform3d FRONT_RIGHT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.012552, -0.319809, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
-    public static final Transform3d BACK_RIGHT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.081165, -0.322330, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
-    public static final Transform3d FRONT_LEFT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.012552, 0.319809, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
-    public static final Transform3d BACK_LEFT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.081165, 0.322330, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
+    public static final Transform3d FRONT_RIGHT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.012552, -0.319809, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
+    public static final Transform3d BACK_RIGHT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.081165, -0.322330, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
+    public static final Transform3d FRONT_LEFT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.012552, 0.319809, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
+    public static final Transform3d BACK_LEFT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.081165, 0.322330, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
+  }
+
+  public final class Intake {
+    public static enum RollerState {
+      In(5, 4),
+      SlowIn(2, 3),
+      Out(-12, 0),
+      TroughOut(3.25, 0),
+      Off(0, 0);
+
+      public final double rollingVoltage;
+      public final double centeringVoltage;
+
+      RollerState(double rollingVoltage, double centeringVoltage) {
+        this.rollingVoltage = rollingVoltage;
+        this.centeringVoltage = centeringVoltage;
+      }
+    }
+
+    public static double SETPOINT_THRESHOLD = 0.1;
+
+    public static enum PivotState {
+      Up(0),
+      Down(0),
+      Trough(0);
+
+      public final double pos;
+
+      PivotState(double pos) {
+        this.pos = pos;
+      }
+    }
+  }
+
+  public final class Arm {
+    public static enum RollerState {
+      In(0),
+      AlgeaIn(0),
+      AlgeaIdle(0),
+      Out(0),
+      SlowOut(0),
+      AlgeaOut(0),
+      Off(0);
+
+      public final double rollingVoltage;
+
+      RollerState(double rollingVoltage) {
+        this.rollingVoltage = rollingVoltage;
+      }
+    }
+
+    public static double SETPOINT_THRESHOLD = 0.1;
+
+    public static enum PivotState {
+      AlgeaInLeft(0),
+      AlgeaInRight(0),
+      CoralIn(0),
+      AlgeaOutLeft(0),
+      AlgeaOutRight(0),
+      ScoreCoral(0),
+      FinishScoreCoral(0),
+      AboveScoreCoral(0),
+      L4ScoreCoral(0),
+      L4FinishScoreCoral(0),
+      Start(0);
+
+      public final double pos;
+
+      PivotState(double pos) {
+        this.pos = pos;
+      }
+    }
   }
 }
