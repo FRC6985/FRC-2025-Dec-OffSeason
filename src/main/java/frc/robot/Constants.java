@@ -36,6 +36,10 @@ public final class Constants {
     public static final int IntakeCenteringMotor = 0;
     public static final int IntakeRollerMotor = 0;
     public static final int IntakePivotMotor = 0;
+    public static final int ArmRollerMotor = 0;
+    public static final int ArmPivotMotor = 0;
+    public static final int ElevatorMainMotor = 0;
+    public static final int ElevatorFollowerMotor = 0;
   }
 
   public static final class Field {
@@ -193,6 +197,8 @@ public final class Constants {
 
   public final class Elevator {
 
+
+
     public static final double SPOOL_RADIUS = Units.inchesToMeters(0.75);
     public static final double GEAR_RATIO = 4.0;
 
@@ -228,7 +234,39 @@ public final class Constants {
 
     // public static final double SAFE_HEIGHT = 0.837198 - 0.01;
 
-   
+    public static enum State {
+      Down(0.0),
+      PreHandoff(Units.inchesToMeters(36.0)),
+      Handoff(Units.inchesToMeters(33.25)),
+      SourceIntake(Units.inchesToMeters(53.0)),
+      PreScore(Units.inchesToMeters(20.0)),
+      Trough(Units.inchesToMeters(38.0)),
+      L2(Units.inchesToMeters(15.0)),
+      L3(L2.rawExtension + Units.inchesToMeters(15.8701)),
+      L4(Units.inchesToMeters(54.5 - 0.125)),
+      Barge(Units.inchesToMeters(55.0 - 0.125)),
+      ScoreL4(L4.rawExtension - Units.inchesToMeters(1.0)),
+      ScoreL3(L3.rawExtension - Units.inchesToMeters(3.5)),
+      ScoreL2(L2.rawExtension - Units.inchesToMeters(3.5)),
+      PostL3(L2.rawExtension - Units.inchesToMeters(6.0)), //TODO: Tune
+      PostL2(L2.rawExtension - Units.inchesToMeters(3.5)), //TODO: Tune
+      AutoAlgae(Units.inchesToMeters(21.75)),
+      LowAlgae(Units.inchesToMeters(22.25)),
+      HighAlgae(LowAlgae.rawExtension + Units.inchesToMeters(15.8701)),
+      Processor(Units.inchesToMeters(20.0)),
+      AlgaeRest(Units.inchesToMeters(15.0)),
+      GroundAlgaeIntake(0.14),
+      PopsiclePickup(0.065);
+  
+      public final double rawExtension;
+  
+      State(double rawExtension) {
+          this.rawExtension = rawExtension;
+      }
+
+     
+  }
+  
   }
 
 }
