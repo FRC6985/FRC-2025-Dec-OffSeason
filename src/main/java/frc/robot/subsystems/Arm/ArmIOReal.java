@@ -21,9 +21,9 @@ import frc.robot.Constants.CanIds;
 
 public class ArmIOReal implements ArmIO {
 
-  public final TalonFX pivotMotor = new TalonFX(CanIds.IntakePivotMotor, "canivore");
+  public final TalonFX pivotMotor = new TalonFX(CanIds.ArmPivotMotor, "canivore");
 
-  public final TalonFX rollerMotor = new TalonFX(CanIds.IntakeRollerMotor, "canivore");
+  public final TalonFX rollerMotor = new TalonFX(CanIds.ArmRollerMotor, "canivore");
   public RollerState rollerState = RollerState.Off;
   public PivotState pivotState = PivotState.Start;
 
