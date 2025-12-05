@@ -51,9 +51,10 @@ public class IntakeIOSim implements IntakeIO {
     // TODO Auto-generated method stub
     return null;
   }
+
   @Override
-  public boolean pivotAtSetpoint() {
-      // TODO Auto-generated method stub
-      return false;
+  public boolean atSetpoint() {
+    // TODO Auto-generated method stub
+    return false;
   }
 }

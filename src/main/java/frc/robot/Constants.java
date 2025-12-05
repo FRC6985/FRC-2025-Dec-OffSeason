@@ -7,6 +7,14 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.util.Set;
 
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 public final class Constants {
   public static enum Mode {
     /** Running on a real robot. */
@@ -45,21 +53,49 @@ public final class Constants {
     public static final String BackLeftName = "Back Left";
 
     // Camera poses
-    public static final Transform3d FRONT_RIGHT_TRANSFORM = new Transform3d(
-        new Translation3d(-0.012552, -0.319809, 0.191168),
-        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
-    public static final Transform3d BACK_RIGHT_TRANSFORM = new Transform3d(
-        new Translation3d(-0.081165, -0.322330, 0.191168),
-        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
-    public static final Transform3d FRONT_LEFT_TRANSFORM = new Transform3d(
-        new Translation3d(-0.012552, 0.319809, 0.191168),
-        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
-    public static final Transform3d BACK_LEFT_TRANSFORM = new Transform3d(
-        new Translation3d(-0.081165, 0.322330, 0.191168),
-        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
+    public static final Transform3d FRONT_RIGHT_TRANSFORM =
+        new Transform3d(
+            new Translation3d(-0.012552, -0.319809, 0.191168),
+            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
+    public static final Transform3d BACK_RIGHT_TRANSFORM =
+        new Transform3d(
+            new Translation3d(-0.081165, -0.322330, 0.191168),
+            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
+    public static final Transform3d FRONT_LEFT_TRANSFORM =
+        new Transform3d(
+            new Translation3d(-0.012552, 0.319809, 0.191168),
+            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
+    public static final Transform3d BACK_LEFT_TRANSFORM =
+        new Transform3d(
+            new Translation3d(-0.081165, 0.322330, 0.191168),
+            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
   }
 
   public final class Intake {
+    public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
+    .withMotorOutput(
+        new MotorOutputConfigs()
+            .withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
+    )
+    .withFeedback(
+        new FeedbackConfigs()
+            .withSensorToMechanismRatio(Intake.GEAR_RATIO)
+    )
+    .withSlot0(
+        new Slot0Configs()
+            .withKS(0.0)
+            .withKV(0.0)
+            .withKA(0.0)
+            .withKG(0.0)
+            .withKP(160.0)
+    )
+    .withMotionMagic(
+        new MotionMagicConfigs()
+            .withMotionMagicJerk(2000.0)
+            .withMotionMagicAcceleration(200.0)
+            .withMotionMagicCruiseVelocity(2.0)
+    );
     public static enum RollerState {
       In(5, 4),
       SlowIn(2, 3),
@@ -76,17 +112,17 @@ public final class Constants {
       }
     }
 
-    public static double SETPOINT_THRESHOLD = 0.1;
-
+    public static double SETPOINT_THRESHOLD = Math.toRadians(7.0);
+    public static double GEAR_RATIO = 1.0 / ((12.0/40.0) * (18.0/46.0) * (18.0/60.0) * (12.0/32.0));
     public static enum PivotState {
-      Up(0),
-      Down(0),
-      Trough(0);
+      Up(0.0),
+      Down(Math.toRadians(126.0)),
+      Trough(Math.toRadians(25.6));
 
-      public final double pos;
+      public final double angle;
 
-      PivotState(double pos) {
-        this.pos = pos;
+      PivotState(double angle) {
+        this.angle = angle;
       }
     }
   }

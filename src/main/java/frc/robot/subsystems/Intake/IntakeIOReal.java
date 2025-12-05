@@ -14,21 +14,25 @@ package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Intake.PivotState;
 import frc.robot.Constants.Intake.RollerState;
 
 public class IntakeIOReal implements IntakeIO {
-
+ 
   public final TalonFX pivotMotor = new TalonFX(CanIds.IntakePivotMotor, "canivore");
-  public final MotionMagicVoltage pivotMotionControl=new MotionMagicVoltage(PivotState.Up.pos);
-  // TODO: pivot motor configs will add
 
   public final TalonFX rollerMotor = new TalonFX(CanIds.IntakeRollerMotor, "canivore");
   public final TalonFX centeringMotor = new TalonFX(CanIds.IntakeCenteringMotor, "canivore");
   public RollerState rollerState = RollerState.Off;
   public PivotState pivotState = PivotState.Up;
+
+
+  public IntakeIOReal(){
+    pivotMotor.getConfigurator().apply(Intake.pivotConfig);
+  }
 
   public boolean hasCoral() {
     // TODO: read sensor value
@@ -51,8 +55,10 @@ public class IntakeIOReal implements IntakeIO {
 
     return state;
   }
-  public boolean pivotAtSetpoint(){
-    return Math.abs(pivotMotor.getPosition().getValueAsDouble()-getPivotState().pos)<Intake.SETPOINT_THRESHOLD;
+
+  public boolean atSetpoint() {
+    return Math.abs(pivotMotor.getPosition().getValueAsDouble()*2*Math.PI - getPivotState().angle)
+        < Intake.SETPOINT_THRESHOLD;
   }
 
   public PivotState getPivotState() {
@@ -64,10 +70,14 @@ public class IntakeIOReal implements IntakeIO {
 
     return state;
   }
-
+  public void stop(){
+    rollerMotor.setVoltage(0);
+    centeringMotor.setVoltage(0);
+    pivotMotor.setVoltage(0);
+  }
   public void periodic() {
     rollerMotor.setVoltage(getRollerState().rollingVoltage);
     centeringMotor.setVoltage(getRollerState().centeringVoltage);
-    pivotMotor.setControl(pivotMotionControl.withPosition(getPivotState().pos));
+    pivotMotor.setControl(new MotionMagicVoltage(getPivotState().angle/(2*Math.PI)));
   }
 }

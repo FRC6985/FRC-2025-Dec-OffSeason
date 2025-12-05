@@ -24,7 +24,8 @@ public class Intake extends SubsystemBase {
   public Intake(IntakeIO io) {
     this.io = io;
   }
-   public void setState(PivotState p, RollerState r) {
+
+  public void setState(PivotState p, RollerState r) {
     io.setState(p, r);
   }
 

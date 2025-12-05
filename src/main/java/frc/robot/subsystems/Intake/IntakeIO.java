@@ -21,7 +21,8 @@ public interface IntakeIO {
   void setState(PivotState p, RollerState r);
 
   boolean hasCoral();
-  boolean pivotAtSetpoint();
+
+  boolean atSetpoint();
 
   boolean unsafeToGoUp();
 
