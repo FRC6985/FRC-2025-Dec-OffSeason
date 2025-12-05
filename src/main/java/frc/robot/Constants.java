@@ -197,30 +197,27 @@ public final class Constants {
 
   public final class Elevator {
 
-
-
     public static final double SPOOL_RADIUS = Units.inchesToMeters(0.75);
-    public static final double GEAR_RATIO = 4.0;
+    public static final double GEAR_RATIO = 3.6;
 
     public static TalonFXConfiguration motorConfig = new TalonFXConfiguration().withMotorOutput(
-      new MotorOutputConfigs()
-          .withInverted(InvertedValue.Clockwise_Positive)
-          .withNeutralMode(NeutralModeValue.Brake))
-      .withFeedback(
-          new FeedbackConfigs()
-              .withSensorToMechanismRatio(GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI)))
-      .withSlot0(
-          new Slot0Configs()
-              .withKS(0.0)
-              .withKV(0.0)
-              .withKA(0.0)
-              .withKG(0.37)
-              .withKP(70.0))
-      .withMotionMagic(
-          new MotionMagicConfigs()
-              .withMotionMagicAcceleration(14.0)
-              .withMotionMagicCruiseVelocity(3.0));
-
+        new MotorOutputConfigs()
+            .withInverted(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Brake))
+        .withFeedback(
+            new FeedbackConfigs()
+                .withSensorToMechanismRatio(GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI)))
+        .withSlot0(
+            new Slot0Configs()
+                .withKS(0.0)
+                .withKV(0.0)
+                .withKA(0.0)
+                .withKG(0.37)
+                .withKP(70.0))
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicAcceleration(14.0)
+                .withMotionMagicCruiseVelocity(3.0));
 
     // public static final double ZERO_VOLTAGE = -0.2;
     // public static final double ZERO_MIN_CURRENT = 1.7; // amps
@@ -248,8 +245,8 @@ public final class Constants {
       ScoreL4(L4.rawExtension - Units.inchesToMeters(1.0)),
       ScoreL3(L3.rawExtension - Units.inchesToMeters(3.5)),
       ScoreL2(L2.rawExtension - Units.inchesToMeters(3.5)),
-      PostL3(L2.rawExtension - Units.inchesToMeters(6.0)), //TODO: Tune
-      PostL2(L2.rawExtension - Units.inchesToMeters(3.5)), //TODO: Tune
+      PostL3(L2.rawExtension - Units.inchesToMeters(6.0)), // TODO: Tune
+      PostL2(L2.rawExtension - Units.inchesToMeters(3.5)), // TODO: Tune
       AutoAlgae(Units.inchesToMeters(21.75)),
       LowAlgae(Units.inchesToMeters(22.25)),
       HighAlgae(LowAlgae.rawExtension + Units.inchesToMeters(15.8701)),
@@ -257,16 +254,15 @@ public final class Constants {
       AlgaeRest(Units.inchesToMeters(15.0)),
       GroundAlgaeIntake(0.14),
       PopsiclePickup(0.065);
-  
+
       public final double rawExtension;
-  
+
       State(double rawExtension) {
-          this.rawExtension = rawExtension;
+        this.rawExtension = rawExtension;
       }
 
-     
-  }
-  
+    }
+
   }
 
 }
