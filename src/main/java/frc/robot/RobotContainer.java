@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Intake.PivotState;
@@ -21,16 +20,21 @@ public class RobotContainer {
   public void confirgureButtonBindings(Drive drive) {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX()));
+            drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
-    driver.x().onTrue(new InstantCommand(() -> {
-      subsystems.intake.setState(PivotState.Down, RollerState.In);
-    }));
-    driver.y().onTrue(new InstantCommand(() -> {
-      subsystems.intake.setState(PivotState.Up, RollerState.Out);
-    }));
+    driver
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  subsystems.intake.setState(PivotState.Down, RollerState.In);
+                }));
+    driver
+        .y()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  subsystems.intake.setState(PivotState.Up, RollerState.Out);
+                }));
   }
 }

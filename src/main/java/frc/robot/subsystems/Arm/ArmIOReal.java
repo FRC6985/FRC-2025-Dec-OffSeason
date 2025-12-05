@@ -14,31 +14,29 @@ package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import frc.robot.Constants.CanIds;
 import frc.robot.Constants.Arm;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
+import frc.robot.Constants.CanIds;
 
 public class ArmIOReal implements ArmIO {
 
   public final TalonFX pivotMotor = new TalonFX(CanIds.IntakePivotMotor, "canivore");
-  public final MotionMagicVoltage pivotMotionControl = new MotionMagicVoltage(PivotState.Up.pos);
-  // TODO: pivot motor configs will add
 
   public final TalonFX rollerMotor = new TalonFX(CanIds.IntakeRollerMotor, "canivore");
-  public final TalonFX centeringMotor = new TalonFX(CanIds.IntakeCenteringMotor, "canivore");
   public RollerState rollerState = RollerState.Off;
-  public PivotState pivotState = PivotState.Up;
+  public PivotState pivotState = PivotState.Start;
+
+
+  public ArmIOReal(){
+    pivotMotor.getConfigurator().apply(Arm.pivotConfig);
+  }
 
   public boolean hasCoral() {
     // TODO: read sensor value
     return false;
   }
 
-  public boolean unsafeToGoUp() {
-    // TODO: calucate distance of arm and intake pos
-    return false;
-  }
 
   public void setState(PivotState p, RollerState r) {
     pivotState = p;
@@ -47,30 +45,33 @@ public class ArmIOReal implements ArmIO {
 
   public RollerState getRollerState() {
     RollerState state = rollerState;
-    if (state.equals(RollerState.In) && hasCoral())
-      state = RollerState.SlowIn;
+    // if (state.equals(RollerState.In) && hasCoral()) state = RollerState.SlowIn;
 
     return state;
   }
 
-  public boolean pivotAtSetpoint() {
-    return Math.abs(pivotMotor.getPosition().getValueAsDouble() - getPivotState().pos) < Intake.SETPOINT_THRESHOLD;
+  public boolean atSetpoint() {
+    return Math.abs(pivotMotor.getPosition().getValueAsDouble()*2*Math.PI - getPivotState().angle)
+        < Arm.SETPOINT_THRESHOLD;
   }
 
   public PivotState getPivotState() {
     PivotState state = pivotState;
 
-    if (state.equals(PivotState.Down) && hasCoral())
-      state = PivotState.Up;
+    // if (state.equals(PivotState.Down) && hasCoral()) state = PivotState.Up;
 
-    if (state.equals(PivotState.Up) && unsafeToGoUp())
-      state = PivotState.Down;
+    // if (state.equals(PivotState.Up) && unsafeToGoUp()) state = PivotState.Down;
 
     return state;
   }
-
+  public void stop(){
+    rollerMotor.setVoltage(0);
+    pivotMotor.setVoltage(0);
+  }
   public void periodic() {
     rollerMotor.setVoltage(getRollerState().rollingVoltage);
-    pivotMotor.setControl(pivotMotionControl.withPosition(getPivotState().pos));
+    pivotMotor.setControl(new MotionMagicVoltage(getPivotState().angle/(2*Math.PI)));
   }
+
+
 }

@@ -40,6 +40,7 @@ public class IntakeIOReal implements IntakeIO {
   }
 
   public boolean unsafeToGoUp() {
+    // ArmElevetarpos+ArmHeight*cos(Arm.angle())<Safe distance
     // TODO: calucate distance of arm and intake pos
     return false;
   }

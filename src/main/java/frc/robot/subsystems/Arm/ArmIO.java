@@ -21,8 +21,8 @@ public interface ArmIO {
   void setState(PivotState p, RollerState r);
 
   boolean hasCoral();
-  boolean pivotAtSetpoint();
 
+  boolean atSetpoint();
 
   public RollerState getRollerState();
 

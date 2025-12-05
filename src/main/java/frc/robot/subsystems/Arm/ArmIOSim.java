@@ -12,8 +12,8 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Arm;
 
-import frc.robot.Constants.Intake.PivotState;
-import frc.robot.Constants.Intake.RollerState;
+import frc.robot.Constants.Arm.PivotState;
+import frc.robot.Constants.Arm.RollerState;
 
 public class ArmIOSim implements ArmIO {
   @Override
@@ -35,12 +35,6 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
-  public boolean unsafeToGoUp() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
   public PivotState getPivotState() {
     // TODO Auto-generated method stub
     return null;
@@ -51,9 +45,10 @@ public class ArmIOSim implements ArmIO {
     // TODO Auto-generated method stub
     return null;
   }
+
   @Override
-  public boolean pivotAtSetpoint() {
-      // TODO Auto-generated method stub
-      return false;
+  public boolean atSetpoint() {
+    // TODO Auto-generated method stub
+    return false;
   }
 }

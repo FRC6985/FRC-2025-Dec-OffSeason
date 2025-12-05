@@ -19,8 +19,7 @@ import frc.robot.Constants.Arm.RollerState;
 public class Arm extends SubsystemBase {
   ArmIO io;
 
-  public Arm() {
-  }
+  public Arm() {}
 
   public Arm(ArmIO io) {
     this.io = io;
