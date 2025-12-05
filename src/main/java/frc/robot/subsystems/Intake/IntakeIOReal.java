@@ -12,6 +12,8 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Intake;
 
+import org.opencv.objdetect.Board;
+
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -21,7 +23,7 @@ import frc.robot.Constants.Intake.PivotState;
 import frc.robot.Constants.Intake.RollerState;
 
 public class IntakeIOReal implements IntakeIO {
- 
+
   public final TalonFX pivotMotor = new TalonFX(CanIds.IntakePivotMotor, "canivore");
 
   public final TalonFX rollerMotor = new TalonFX(CanIds.IntakeRollerMotor, "canivore");
@@ -29,8 +31,7 @@ public class IntakeIOReal implements IntakeIO {
   public RollerState rollerState = RollerState.Off;
   public PivotState pivotState = PivotState.Up;
 
-
-  public IntakeIOReal(){
+  public IntakeIOReal() {
     pivotMotor.getConfigurator().apply(Intake.pivotConfig);
   }
 
@@ -48,37 +49,68 @@ public class IntakeIOReal implements IntakeIO {
   public void setState(PivotState p, RollerState r) {
     pivotState = p;
     rollerState = r;
+
   }
 
   public RollerState getRollerState() {
     RollerState state = rollerState;
-    if (state.equals(RollerState.In) && hasCoral()) state = RollerState.SlowIn;
+    if (state.equals(RollerState.In) && hasCoral())
+      state = RollerState.SlowIn;
 
     return state;
   }
 
   public boolean atSetpoint() {
-    return Math.abs(pivotMotor.getPosition().getValueAsDouble()*2*Math.PI - getPivotState().angle)
-        < Intake.SETPOINT_THRESHOLD;
+    return Math.abs(
+        pivotMotor.getPosition().getValueAsDouble() * 2 * Math.PI - getPivotState().angle) < Intake.SETPOINT_THRESHOLD;
+  }
+
+  public double velocity() {
+    return pivotMotor.getVelocity().getValueAsDouble() * 2 * Math.PI;
   }
 
   public PivotState getPivotState() {
     PivotState state = pivotState;
 
-    if (state.equals(PivotState.Down) && hasCoral()) state = PivotState.Up;
+    if (state.equals(PivotState.Down) && hasCoral())
+      state = PivotState.Up;
 
-    if (state.equals(PivotState.Up) && unsafeToGoUp()) state = PivotState.Down;
+    if (state.equals(PivotState.Up) && unsafeToGoUp())
+      state = PivotState.Down;
 
     return state;
   }
-  public void stop(){
+
+  private boolean zeroed = false;
+
+  public boolean isZeroed() {
+    return zeroed;
+  }
+
+  public void setZeroed(boolean z) {
+    zeroed = z;
+  }
+
+  public void zero() {
+    pivotMotor.setPosition(0.0);
+    zeroed = true;
+  }
+
+  public void setZeroingVoltage() {
+    pivotMotor.setVoltage(Intake.ZERO_VOLTAGE);
+  }
+
+  public void stop() {
     rollerMotor.setVoltage(0);
     centeringMotor.setVoltage(0);
     pivotMotor.setVoltage(0);
   }
+
   public void periodic() {
+    if (!isZeroed())
+      return;
     rollerMotor.setVoltage(getRollerState().rollingVoltage);
     centeringMotor.setVoltage(getRollerState().centeringVoltage);
-    pivotMotor.setControl(new MotionMagicVoltage(getPivotState().angle/(2*Math.PI)));
+    pivotMotor.setControl(new MotionMagicVoltage(getPivotState().angle / (2 * Math.PI)));
   }
 }

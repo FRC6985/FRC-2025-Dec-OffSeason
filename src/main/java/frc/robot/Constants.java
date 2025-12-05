@@ -74,6 +74,9 @@ public final class Constants {
   }
 
   public final class Intake {
+
+    public static double ZERO_VOLTAGE = -0.7;
+    public static double ZERO_MIN_CURRENT = 20.0;
     public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
         .withMotorOutput(
             new MotorOutputConfigs()
@@ -219,8 +222,8 @@ public final class Constants {
                 .withMotionMagicAcceleration(14.0)
                 .withMotionMagicCruiseVelocity(3.0));
 
-    // public static final double ZERO_VOLTAGE = -0.2;
-    // public static final double ZERO_MIN_CURRENT = 1.7; // amps
+    public static final double ZERO_VOLTAGE = -0.2;
+    public static final double ZERO_MIN_CURRENT = 1.7; // amps
 
     public static final double SETPOINT_THRESHOLD = 0.01;
     // public static final double LAZIER_SETPOINT_THRESHOLD = 0.03;
