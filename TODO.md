@@ -1,3 +1,4 @@
 - Add a class for control similer to Superstructre in chillout code
 - Define all states
-- Add arm and elevator zero commands
+- Add arm zero command
+- Add ElevatroIO functions into Elevator
