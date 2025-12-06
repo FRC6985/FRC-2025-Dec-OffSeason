@@ -67,8 +67,8 @@ public class Robot extends LoggedRobot {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Subsystems
-    this.subSystems = new SubSystems();
-    this.robotContainer = new RobotContainer(subSystems);
+    this.subSystems = new SubSystems(robotContainer);
+    this.robotContainer = new RobotContainer(subSystems, this);
   }
 
   @Override

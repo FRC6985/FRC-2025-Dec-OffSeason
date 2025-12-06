@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.LoggedRobot;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
@@ -8,6 +10,8 @@ import frc.robot.subsystems.drive.Drive;
 
 public class RobotContainer {
   public final SubSystems subsystems;
+  public final LoggedRobot robot;
+
   public final CommandXboxController driver = new CommandXboxController(0);
 
   public boolean isRedAlliance() {
@@ -18,8 +22,12 @@ public class RobotContainer {
     return subsystems.drive.poseEstimator.getEstimatedPosition().getX() > (Constants.Field.FIELD_X_SIZE / 2);
   }
 
-  public RobotContainer(SubSystems subsystems) {
+  public long tickNumber = 0;
+
+  public RobotContainer(SubSystems subsystems, LoggedRobot robot) {
     this.subsystems = subsystems;
+    this.robot = robot;
+
     confirgureButtonBindings(subsystems.drive);
   }
 
@@ -30,5 +38,6 @@ public class RobotContainer {
   }
 
   public void periodic() {
+    tickNumber++;
   }
 }

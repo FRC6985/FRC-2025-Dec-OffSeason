@@ -35,7 +35,7 @@ public class SubSystems {
         // Real robot, instantiate hardware IO implementations
         vision = new Vision(new VisionIOReal());
         intake = new Intake(new IntakeIOReal());
-        arm = new Arm(new ArmIOReal());
+        arm = new Arm(new ArmIOReal(rC));
         elevator = new Elevator(new ElevatorIOReal(rC));
         drive = new Drive(
             new GyroIOPigeon2(),
