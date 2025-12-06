@@ -9,9 +9,7 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
   ElevatorIO io;
 
   // Constructor
-  public Elevator() {
-
-  }
+  public Elevator() {}
 
   public Elevator(ElevatorIO io) {
     this.io = io;

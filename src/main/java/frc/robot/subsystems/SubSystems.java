@@ -2,12 +2,12 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Elevator.Elevator;
-import frc.robot.subsystems.Elevator.ElevatorIOReal;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Arm.ArmIOReal;
 import frc.robot.subsystems.Arm.ArmIOSim;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorIOReal;
 import frc.robot.subsystems.Elevator.ElevatorIOSim;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Intake.IntakeIOReal;
@@ -37,13 +37,14 @@ public class SubSystems {
         intake = new Intake(new IntakeIOReal());
         arm = new Arm(new ArmIOReal(rC));
         elevator = new Elevator(new ElevatorIOReal(rC));
-        drive = new Drive(
-            new GyroIOPigeon2(),
-            vision,
-            new ModuleIOTalonFX(TunerConstants.FrontLeft),
-            new ModuleIOTalonFX(TunerConstants.FrontRight),
-            new ModuleIOTalonFX(TunerConstants.BackLeft),
-            new ModuleIOTalonFX(TunerConstants.BackRight));
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                vision,
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
         break;
 
       case SIM:
@@ -52,14 +53,14 @@ public class SubSystems {
         intake = new Intake(new IntakeIOSim());
         arm = new Arm(new ArmIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-        drive = new Drive(
-            new GyroIO() {
-            },
-            vision,
-            new ModuleIOSim(TunerConstants.FrontLeft),
-            new ModuleIOSim(TunerConstants.FrontRight),
-            new ModuleIOSim(TunerConstants.BackLeft),
-            new ModuleIOSim(TunerConstants.BackRight));
+        drive =
+            new Drive(
+                new GyroIO() {},
+                vision,
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
         break;
 
       default:
@@ -67,18 +68,14 @@ public class SubSystems {
         intake = new Intake();
         arm = new Arm();
         elevator = new Elevator();
-        drive = new Drive(
-            new GyroIO() {
-            },
-            vision,
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            });
+        drive =
+            new Drive(
+                new GyroIO() {},
+                vision,
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
 
         break;
     }

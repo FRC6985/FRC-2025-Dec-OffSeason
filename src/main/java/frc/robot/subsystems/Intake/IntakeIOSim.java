@@ -94,5 +94,4 @@ public class IntakeIOSim implements IntakeIO {
     // TODO Auto-generated method stub
 
   }
-
 }

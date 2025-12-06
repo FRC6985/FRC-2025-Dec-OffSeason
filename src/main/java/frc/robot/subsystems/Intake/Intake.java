@@ -19,8 +19,7 @@ import frc.robot.Constants.Intake.RollerState;
 public class Intake extends SubsystemBase implements IntakeIO {
   IntakeIO io;
 
-  public Intake() {
-  }
+  public Intake() {}
 
   public Intake(IntakeIO io) {
     this.io = io;

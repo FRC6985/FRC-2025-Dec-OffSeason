@@ -14,7 +14,6 @@ package frc.robot.subsystems.Intake;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Intake.PivotState;
@@ -47,20 +46,19 @@ public class IntakeIOReal implements IntakeIO {
   public void setState(PivotState p, RollerState r) {
     pivotState = p;
     rollerState = r;
-
   }
 
   public RollerState getRollerState() {
     RollerState state = rollerState;
-    if (state.equals(RollerState.In) && hasCoral())
-      state = RollerState.SlowIn;
+    if (state.equals(RollerState.In) && hasCoral()) state = RollerState.SlowIn;
 
     return state;
   }
 
   public boolean atSetpoint() {
     return Math.abs(
-        pivotMotor.getPosition().getValueAsDouble() * 2 * Math.PI - getPivotState().angle) < Intake.SETPOINT_THRESHOLD;
+            pivotMotor.getPosition().getValueAsDouble() * 2 * Math.PI - getPivotState().angle)
+        < Intake.SETPOINT_THRESHOLD;
   }
 
   public double velocity() {
@@ -70,11 +68,9 @@ public class IntakeIOReal implements IntakeIO {
   public PivotState getPivotState() {
     PivotState state = pivotState;
 
-    if (state.equals(PivotState.Down) && hasCoral())
-      state = PivotState.Up;
+    if (state.equals(PivotState.Down) && hasCoral()) state = PivotState.Up;
 
-    if (state.equals(PivotState.Up) && unsafeToGoUp())
-      state = PivotState.Down;
+    if (state.equals(PivotState.Up) && unsafeToGoUp()) state = PivotState.Down;
 
     return state;
   }
@@ -105,8 +101,7 @@ public class IntakeIOReal implements IntakeIO {
   }
 
   public void periodic() {
-    if (!isZeroed())
-      return;
+    if (!isZeroed()) return;
     rollerMotor.setVoltage(getRollerState().rollingVoltage);
     centeringMotor.setVoltage(getRollerState().centeringVoltage);
     pivotMotor.setControl(new MotionMagicVoltage(getPivotState().angle / (2 * Math.PI)));
