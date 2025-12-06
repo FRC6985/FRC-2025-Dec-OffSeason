@@ -19,51 +19,16 @@ import frc.robot.Constants.Intake.RollerState;
 public class Intake extends SubsystemBase implements IntakeIO {
   IntakeIO io;
 
-  public Intake() {}
+  public Intake() {
+  }
 
   public Intake(IntakeIO io) {
     this.io = io;
   }
 
-  public void setState(PivotState p, RollerState r) {
-    io.setState(p, r);
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return io.atSetpoint();
-  }
-
-  @Override
-  public double velocity() {
-
-    return io.velocity();
-  }
-
-  @Override
-  public PivotState getPivotState() {
-    return io.getPivotState();
-  }
-
-  @Override
-  public RollerState getRollerState() {
-    return io.getRollerState();
-  }
-
   @Override
   public boolean hasCoral() {
-
     return io.hasCoral();
-  }
-
-  @Override
-  public boolean isZeroed() {
-    return io.isZeroed();
-  }
-
-  @Override
-  public void setZeroed(boolean z) {
-    io.setZeroed(z);
   }
 
   @Override
@@ -77,17 +42,43 @@ public class Intake extends SubsystemBase implements IntakeIO {
   }
 
   @Override
-  public void stop() {
-    io.zero();
+  public void setState(PivotState pivotState, RollerState rollerState) {
+    io.setState(pivotState, rollerState);
   }
 
   @Override
-  public boolean unsafeToGoUp() {
-    return io.unsafeToGoUp();
+  public boolean isZeroed() {
+    return io.isZeroed();
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return io.atSetpoint();
+  }
+
+  @Override
+  public void setZeroed(boolean zeroed) {
+    io.setZeroed(zeroed);
+  }
+
+  @Override
+  public void stop() {
+    io.stop();
+  }
+
+  @Override
+  public double getAngle() {
+    return io.getAngle();
+  }
+
+  @Override
+  public double getVelocity() {
+    return io.getVelocity();
   }
 
   @Override
   public void periodic() {
+    super.periodic();
     io.periodic();
   }
 }

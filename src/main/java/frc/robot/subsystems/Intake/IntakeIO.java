@@ -12,33 +12,33 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Intake;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants.Intake.PivotState;
 import frc.robot.Constants.Intake.RollerState;
 
 public interface IntakeIO {
-  public void periodic();
+  void periodic();
 
-  public void setState(PivotState p, RollerState r);
+  void initSendable(SendableBuilder builder);
 
-  public boolean hasCoral();
+  double getAngle();
 
-  public boolean atSetpoint();
+  double getVelocity();
 
-  public double velocity();
+  boolean hasCoral();
 
-  public boolean unsafeToGoUp();
+  boolean atSetpoint();
 
-  public boolean isZeroed();
+  void zero();
 
-  public void setZeroed(boolean z);
+  void setZeroingVoltage();
 
-  public void setZeroingVoltage();
+  void stop();
 
-  public void zero();
+  void setState(PivotState p, RollerState r);
 
-  public void stop();
+  boolean isZeroed();
 
-  public RollerState getRollerState();
+  void setZeroed(boolean z);
 
-  public PivotState getPivotState();
 }

@@ -12,6 +12,7 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Arm;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Arm.PivotState;
@@ -21,7 +22,8 @@ import frc.robot.Constants.Arm.Side;
 public class Arm extends SubsystemBase implements ArmIO {
   ArmIO io;
 
-  public Arm() {}
+  public Arm() {
+  }
 
   public Arm(ArmIO io) {
     this.io = io;
@@ -119,5 +121,10 @@ public class Arm extends SubsystemBase implements ArmIO {
   @Override
   public void setZeroed(boolean z) {
     io.setZeroed(z);
+  }
+
+  @Override
+  public InterpolatingDoubleTreeMap getElevatorToArm() {
+    return io.getElevatorToArm();
   }
 }

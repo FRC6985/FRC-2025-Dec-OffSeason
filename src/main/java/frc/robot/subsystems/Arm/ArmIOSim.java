@@ -12,6 +12,7 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Arm;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
@@ -131,5 +132,11 @@ public class ArmIOSim implements ArmIO {
   public void setZeroed(boolean z) {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public InterpolatingDoubleTreeMap getElevatorToArm() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

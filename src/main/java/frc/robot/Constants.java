@@ -51,6 +51,10 @@ public final class Constants {
     public static final int armEncoder = 0;
   }
 
+  public static final class DioIds {
+    public static final int IntakeLineBreak = 0;
+  }
+
   public final class Field {
 
     public static final double FIELD_X_SIZE = 17.548249;
@@ -62,8 +66,8 @@ public final class Constants {
     public static final double SAFE_WALL_DISTANCE = 1.0;
 
     /** Center of the blue reef */
-    public static final Translation2d BLUE_REEF_CENTER =
-        new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+    public static final Translation2d BLUE_REEF_CENTER = new Translation2d(Units.inchesToMeters(176.75),
+        Units.inchesToMeters(158.5));
 
     /** Dist from robot center to reef center when aligned to a reef edge */
     public static final double ROBOT_REEF_CENTER_DISTANCE = Units.inchesToMeters(32.25 + 18.0);
@@ -86,26 +90,23 @@ public final class Constants {
         Rotation2d angleRot = new Rotation2d(Math.toRadians(angle));
         Rotation2d anglePlus90 = new Rotation2d(Math.toRadians(angle + 90));
 
-        for (int direction : new int[] {1, -1}) {
-          for (int side : new int[] {1, -1}) {
+        for (int direction : new int[] { 1, -1 }) {
+          for (int side : new int[] { 1, -1 }) {
 
             Pose2d base = new Pose2d(BLUE_REEF_CENTER, new Rotation2d());
 
-            Transform2d t1 =
-                new Transform2d(
-                    new Translation2d(-ROBOT_REEF_CENTER_DISTANCE, 0).rotateBy(angleRot),
-                    new Rotation2d());
+            Transform2d t1 = new Transform2d(
+                new Translation2d(-ROBOT_REEF_CENTER_DISTANCE, 0).rotateBy(angleRot),
+                new Rotation2d());
 
-            Transform2d t2 =
-                new Transform2d(
-                    new Translation2d(direction * REEF_BRANCH_OFFSET_DISTANCE, 0)
-                        .rotateBy(anglePlus90),
-                    angleRot);
+            Transform2d t2 = new Transform2d(
+                new Translation2d(direction * REEF_BRANCH_OFFSET_DISTANCE, 0)
+                    .rotateBy(anglePlus90),
+                angleRot);
 
-            Transform2d t3 =
-                new Transform2d(
-                    new Translation2d(0.0, side * Arm.CORAL_CENTER_OFFSET),
-                    new Rotation2d(-side * Math.PI / 2.0));
+            Transform2d t3 = new Transform2d(
+                new Translation2d(0.0, side * Arm.CORAL_CENTER_OFFSET),
+                new Rotation2d(-side * Math.PI / 2.0));
 
             poses.add(base.plus(t1).plus(t2).plus(t3));
           }
@@ -129,19 +130,17 @@ public final class Constants {
         Rotation2d angleRot = new Rotation2d(Math.toRadians(angle));
         Rotation2d anglePlus90 = new Rotation2d(Math.toRadians(angle + 90));
 
-        for (int direction : new int[] {1, -1}) {
+        for (int direction : new int[] { 1, -1 }) {
 
           Pose2d base = new Pose2d(BLUE_REEF_CENTER, new Rotation2d());
 
-          Transform2d t1 =
-              new Transform2d(
-                  new Translation2d(-ROBOT_REEF_CENTER_DISTANCE, 0).rotateBy(angleRot),
-                  new Rotation2d());
+          Transform2d t1 = new Transform2d(
+              new Translation2d(-ROBOT_REEF_CENTER_DISTANCE, 0).rotateBy(angleRot),
+              new Rotation2d());
 
-          Transform2d t2 =
-              new Transform2d(
-                  new Translation2d(direction * TROUGH_OFFSET_DISTANCE, 0).rotateBy(anglePlus90),
-                  angleRot);
+          Transform2d t2 = new Transform2d(
+              new Translation2d(direction * TROUGH_OFFSET_DISTANCE, 0).rotateBy(anglePlus90),
+              angleRot);
 
           poses.add(base.plus(t1).plus(t2));
         }
@@ -163,19 +162,17 @@ public final class Constants {
 
         Rotation2d angleRot = new Rotation2d(Math.toRadians(angle));
 
-        for (int side : new int[] {1, -1}) {
+        for (int side : new int[] { 1, -1 }) {
 
           Pose2d base = new Pose2d(BLUE_REEF_CENTER, new Rotation2d());
 
-          Transform2d t1 =
-              new Transform2d(
-                  new Translation2d(-ROBOT_REEF_CENTER_DISTANCE + 0.05, 0).rotateBy(angleRot),
-                  angleRot);
+          Transform2d t1 = new Transform2d(
+              new Translation2d(-ROBOT_REEF_CENTER_DISTANCE + 0.05, 0).rotateBy(angleRot),
+              angleRot);
 
-          Transform2d t2 =
-              new Transform2d(
-                  new Translation2d(0.0, side * Arm.CORAL_CENTER_OFFSET),
-                  new Rotation2d(-side * Math.PI / 2.0));
+          Transform2d t2 = new Transform2d(
+              new Translation2d(0.0, side * Arm.CORAL_CENTER_OFFSET),
+              new Rotation2d(-side * Math.PI / 2.0));
 
           poses.add(base.plus(t1).plus(t2));
         }
@@ -197,46 +194,46 @@ public final class Constants {
     // Mirror helper (equivalent to pose.mirror() in Kotlin utils)
     private static List<Pose2d> mirrorList(List<Pose2d> src) {
       List<Pose2d> mirrored = new ArrayList<>();
-      for (Pose2d p : src) mirrored.add(Utils.mirrorPose(p)); // uses your existing mirror method
+      for (Pose2d p : src)
+        mirrored.add(Utils.mirrorPose(p)); // uses your existing mirror method
       return mirrored;
     }
 
-    private Field() {}
+    private Field() {
+    }
   }
 
   // Arm angle (radians) -> Elevator height (meters)
-  public static final List<double[]> ARM_ELEVATOR_PAIRS =
-      Arrays.asList(
-          new double[] {Math.toRadians(7.0), 0.0},
-          new double[] {Math.toRadians(18.775917), 0.044542},
-          new double[] {Math.toRadians(26.241907), 0.068086},
-          new double[] {Math.toRadians(34.899764), 0.100567},
-          new double[] {Math.toRadians(44.171701), 0.137335},
-          new double[] {Math.toRadians(55.042173), 0.184139},
-          new double[] {Math.toRadians(68.556032), 0.253736},
-          new double[] {Math.toRadians(180.0 - 96.880), 0.324134},
-          new double[] {Math.toRadians(180.0 - 87.206214), 0.371332},
-          new double[] {Math.toRadians(180.0 - 82.416832), 0.396130},
-          new double[] {Math.toRadians(180.0 - 71.851303), 0.441318},
-          new double[] {Math.toRadians(180.0 - 68.941494), 0.483176},
-          new double[] {Math.toRadians(180.0 - 65.996990), 0.521174},
-          new double[] {Math.toRadians(180.0 - 64.161654), 0.558276},
-          new double[] {Math.toRadians(180.0 - 62.064537), 0.619367},
-          new double[] {Math.toRadians(180.0 - 58.290246), 0.654566},
-          new double[] {Math.toRadians(180.0 - 55.419787), 0.701323 - 0.0254},
-          new double[] {Math.toRadians(180.0 - 47.462013), 0.750120 - 0.0254},
-          new double[] {Math.toRadians(180.0 - 40.585547), 0.802161 - 0.0254},
-          new double[] {Math.toRadians(180.0), Elevator.SAFE_HEIGHT});
+  public static final List<double[]> ARM_ELEVATOR_PAIRS = Arrays.asList(
+      new double[] { Math.toRadians(7.0), 0.0 },
+      new double[] { Math.toRadians(18.775917), 0.044542 },
+      new double[] { Math.toRadians(26.241907), 0.068086 },
+      new double[] { Math.toRadians(34.899764), 0.100567 },
+      new double[] { Math.toRadians(44.171701), 0.137335 },
+      new double[] { Math.toRadians(55.042173), 0.184139 },
+      new double[] { Math.toRadians(68.556032), 0.253736 },
+      new double[] { Math.toRadians(180.0 - 96.880), 0.324134 },
+      new double[] { Math.toRadians(180.0 - 87.206214), 0.371332 },
+      new double[] { Math.toRadians(180.0 - 82.416832), 0.396130 },
+      new double[] { Math.toRadians(180.0 - 71.851303), 0.441318 },
+      new double[] { Math.toRadians(180.0 - 68.941494), 0.483176 },
+      new double[] { Math.toRadians(180.0 - 65.996990), 0.521174 },
+      new double[] { Math.toRadians(180.0 - 64.161654), 0.558276 },
+      new double[] { Math.toRadians(180.0 - 62.064537), 0.619367 },
+      new double[] { Math.toRadians(180.0 - 58.290246), 0.654566 },
+      new double[] { Math.toRadians(180.0 - 55.419787), 0.701323 - 0.0254 },
+      new double[] { Math.toRadians(180.0 - 47.462013), 0.750120 - 0.0254 },
+      new double[] { Math.toRadians(180.0 - 40.585547), 0.802161 - 0.0254 },
+      new double[] { Math.toRadians(180.0), Elevator.SAFE_HEIGHT });
 
-  public static final List<double[]> ARM_INTERPOLATION_INTAKE_DOWN =
-      Arrays.asList(
-          new double[] {Math.toRadians(88.0), 0.0},
-          new double[] {Math.toRadians(103.296), 0.12},
-          new double[] {Math.toRadians(113.75), 0.202},
-          new double[] {Math.toRadians(117.77), 0.333},
-          new double[] {Math.toRadians(131.77), 0.456},
-          new double[] {Math.toRadians(137.593), 0.533},
-          new double[] {Math.toRadians(180.0), 0.660});
+  public static final List<double[]> ARM_INTERPOLATION_INTAKE_DOWN = Arrays.asList(
+      new double[] { Math.toRadians(88.0), 0.0 },
+      new double[] { Math.toRadians(103.296), 0.12 },
+      new double[] { Math.toRadians(113.75), 0.202 },
+      new double[] { Math.toRadians(117.77), 0.333 },
+      new double[] { Math.toRadians(131.77), 0.456 },
+      new double[] { Math.toRadians(137.593), 0.533 },
+      new double[] { Math.toRadians(180.0), 0.660 });
 
   public static final class Vision {
     // AprilTag Settings
@@ -250,49 +247,46 @@ public final class Constants {
     public static final String BackLeftName = "Back Left";
 
     // Camera poses
-    public static final Transform3d FRONT_RIGHT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.012552, -0.319809, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
-    public static final Transform3d BACK_RIGHT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.081165, -0.322330, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
-    public static final Transform3d FRONT_LEFT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.012552, 0.319809, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
-    public static final Transform3d BACK_LEFT_TRANSFORM =
-        new Transform3d(
-            new Translation3d(-0.081165, 0.322330, 0.191168),
-            new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
+    public static final Transform3d FRONT_RIGHT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.012552, -0.319809, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-70.0)));
+    public static final Transform3d BACK_RIGHT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.081165, -0.322330, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(-(180.0 - 55.0))));
+    public static final Transform3d FRONT_LEFT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.012552, 0.319809, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(70.0)));
+    public static final Transform3d BACK_LEFT_TRANSFORM = new Transform3d(
+        new Translation3d(-0.081165, 0.322330, 0.191168),
+        new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
   }
 
   public final class Intake {
 
     public static double ZERO_VOLTAGE = -0.7;
     public static double ZERO_MIN_CURRENT = 20.0;
-    public static TalonFXConfiguration pivotConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(InvertedValue.Clockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Coast))
-            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Intake.GEAR_RATIO))
-            .withSlot0(
-                new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.0).withKP(160.0))
-            .withMotionMagic(
-                new MotionMagicConfigs()
-                    .withMotionMagicJerk(2000.0)
-                    .withMotionMagicAcceleration(200.0)
-                    .withMotionMagicCruiseVelocity(2.0));
+    public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Coast))
+        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Intake.GEAR_RATIO))
+        .withSlot0(
+            new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.0).withKP(160.0))
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicJerk(2000.0)
+                .withMotionMagicAcceleration(200.0)
+                .withMotionMagicCruiseVelocity(2.0));
 
     public static enum RollerState {
-      In(5, 4),
-      SlowIn(2, 3),
-      Out(-12, 0),
-      TroughOut(3.25, 0),
-      Off(0, 0);
+      In(-6.0, -8.0),
+      SlowIn(-2.0, -3.0),
+      TroughOut(3.25, 0.0),
+      Out(8.0, 0.0),
+      Off(0.0, 0.0),
+      AlgaeModeIdle(0.0, 0.0),
+      OperatorControl(0.0, 0.0);
 
       public final double rollingVoltage;
       public final double centeringVoltage;
@@ -304,13 +298,13 @@ public final class Constants {
     }
 
     public static double SETPOINT_THRESHOLD = Math.toRadians(7.0);
-    public static double GEAR_RATIO =
-        1.0 / ((12.0 / 40.0) * (18.0 / 46.0) * (18.0 / 60.0) * (12.0 / 32.0));
+    public static double GEAR_RATIO = 1.0 / ((12.0 / 40.0) * (18.0 / 46.0) * (18.0 / 60.0) * (12.0 / 32.0));
 
     public static enum PivotState {
-      Up(0.0),
       Down(Math.toRadians(126.0)),
-      Trough(Math.toRadians(25.6));
+      Trough(Math.toRadians(25.639507)),
+      Up(0.0),
+      OperatorControl(0.0);
 
       public final double angle;
 
@@ -327,24 +321,23 @@ public final class Constants {
 
     public static double PIVOT_GEAR_RATIO = (12.0 / 60.0) * (20.0 / 60.0) * (12.0 / 54.0);
 
-    public static TalonFXConfiguration pivotConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(InvertedValue.Clockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(1.0 / PIVOT_GEAR_RATIO))
-            .withSlot0(
-                new Slot0Configs().withKS(0.0).withKV(0.1).withKA(0.0).withKG(0.0).withKP(80.0))
-            .withMotionMagic(
-                new MotionMagicConfigs()
-                    .withMotionMagicJerk(9999.0)
-                    .withMotionMagicAcceleration(4.5)
-                    .withMotionMagicCruiseVelocity(2.0))
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(70.0)
-                    .withSupplyCurrentLimit(50.0));
+    public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake))
+        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(1.0 / PIVOT_GEAR_RATIO))
+        .withSlot0(
+            new Slot0Configs().withKS(0.0).withKV(0.1).withKA(0.0).withKG(0.0).withKP(80.0))
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicJerk(9999.0)
+                .withMotionMagicAcceleration(4.5)
+                .withMotionMagicCruiseVelocity(2.0))
+        .withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(70.0)
+                .withSupplyCurrentLimit(50.0));
 
     public enum RollerState {
       Off(0.0),
@@ -457,8 +450,7 @@ public final class Constants {
     public static final double ALLOWED_OPERATING_RANGE_MIN = Math.toRadians(-350.0);
     public static final double ALLOWED_OPERATING_RANGE_MAX = Math.toRadians(350.0);
 
-    public static double PIVOT_ENCODER_RATIO =
-        (36.0 / 18.0) * (36.0 / 18.0) * (60.0 / 24.0) * (12.0 / 54.0);
+    public static double PIVOT_ENCODER_RATIO = (36.0 / 18.0) * (36.0 / 18.0) * (60.0 / 24.0) * (12.0 / 54.0);
 
     public static double PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS = .7209;
 
@@ -474,21 +466,20 @@ public final class Constants {
     public static final double SPOOL_RADIUS = Units.inchesToMeters(0.75);
     public static final double GEAR_RATIO = 3.6;
 
-    public static TalonFXConfiguration motorConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(InvertedValue.Clockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withSensorToMechanismRatio(GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI)))
-            .withSlot0(
-                new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.37).withKP(70.0))
-            .withMotionMagic(
-                new MotionMagicConfigs()
-                    .withMotionMagicAcceleration(14.0)
-                    .withMotionMagicCruiseVelocity(3.0));
+    public static TalonFXConfiguration motorConfig = new TalonFXConfiguration()
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.Clockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake))
+        .withFeedback(
+            new FeedbackConfigs()
+                .withSensorToMechanismRatio(GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI)))
+        .withSlot0(
+            new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.37).withKP(70.0))
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicAcceleration(14.0)
+                .withMotionMagicCruiseVelocity(3.0));
 
     public static final double ZERO_VOLTAGE = -0.2;
     public static final double ZERO_MIN_CURRENT = 1.7; // amps
