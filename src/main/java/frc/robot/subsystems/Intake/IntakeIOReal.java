@@ -12,8 +12,6 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Intake;
 
-import org.opencv.objdetect.Board;
-
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
