@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorIOReal;
 import frc.robot.generated.TunerConstants;
@@ -28,14 +29,14 @@ public class SubSystems {
   public final Arm arm;
   public final Elevator elevator;
 
-  public SubSystems() {
+  public SubSystems(RobotContainer rC) {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         vision = new Vision(new VisionIOReal());
         intake = new Intake(new IntakeIOReal());
         arm = new Arm(new ArmIOReal());
-        elevator = new Elevator(new ElevatorIOReal());
+        elevator = new Elevator(new ElevatorIOReal(rC));
         drive = new Drive(
             new GyroIOPigeon2(),
             vision,

@@ -1,17 +1,7 @@
-// Copyright 2025-2026 FRC 6985
-// https://www.enkatech6985.com/
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
 package frc.robot.subsystems.Elevator;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.Constants.Elevator.AlgaeHeight;
 import frc.robot.Constants.Elevator.State;
 
 public interface ElevatorIO {
@@ -19,20 +9,37 @@ public interface ElevatorIO {
 
   void setState(State state);
 
+  State getState();
+
   boolean atSetpoint();
 
-  public boolean isZeroed();
+  boolean lazierAtSetpoint();
 
-  public void setZeroed(boolean z);
+  boolean atOrAboveSetpoint();
 
-  public void setZeroingVoltage();
+  double getExtension(State s);
 
-  public void zero();
+  double getHeight();
 
-  public void stop();
+  double getVelocity();
 
-  public State getState();
+  double clampSetpoint(double s);
 
-  public double getStatorCurrent();
+  double getLastClampedSetpointForLogging();
 
+  Translation2d endOfManipulatorPose();
+
+  AlgaeHeight preferredAlgaeHeight();
+
+  boolean isZeroed();
+
+  void setZeroed(boolean z);
+
+  void setZeroingVoltage();
+
+  void zero();
+
+  void stop();
+
+  double getStatorCurrent();
 }

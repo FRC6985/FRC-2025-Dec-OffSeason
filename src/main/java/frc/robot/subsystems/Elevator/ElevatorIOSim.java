@@ -12,6 +12,8 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Elevator;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.Constants.Elevator.AlgaeHeight;
 import frc.robot.Constants.Elevator.State;
 
 public class ElevatorIOSim implements ElevatorIO {
@@ -19,6 +21,60 @@ public class ElevatorIOSim implements ElevatorIO {
   public void periodic() {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public boolean atOrAboveSetpoint() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public double clampSetpoint(double s) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public Translation2d endOfManipulatorPose() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double getExtension(State s) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public double getHeight() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public double getLastClampedSetpointForLogging() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public double getVelocity() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean lazierAtSetpoint() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public AlgaeHeight preferredAlgaeHeight() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
