@@ -1,30 +1,43 @@
-// Copyright 2025-2026 FRC 6985
-// https://www.enkatech6985.com/
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
 package frc.robot.subsystems.Arm;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
+import frc.robot.Constants.Arm.Side;
 
 public interface ArmIO {
-  void periodic();
 
-  void setState(PivotState p, RollerState r);
-
-  boolean hasCoral();
+  double getPosition();
 
   boolean atSetpoint();
 
-  public RollerState getRollerState();
+  boolean getInsideFrame();
 
-  public PivotState getPivotState();
+  boolean getUndebouncedHasObject();
+
+  Side getSideCloserToReef();
+
+  Side getSideCloserToBarge();
+
+  Side getSideCloserToProcessor();
+
+  boolean atSafeReefDistance();
+
+  double getDesiredPosition();
+
+  double positionFromAngle(double angle, boolean respectReef);
+
+  void setState(PivotState pivot, RollerState rollers);
+
+  void setCoastEnabled(boolean coast);
+
+  void offsetArm(double r);
+
+  double closeClampedPosition();
+
+  void resetRelativeFromAbsolute();
+
+  void periodic();
+
+  void initSendable(SendableBuilder builder);
 }
