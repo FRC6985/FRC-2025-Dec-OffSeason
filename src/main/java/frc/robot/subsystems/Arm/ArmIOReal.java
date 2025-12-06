@@ -26,21 +26,19 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.Arm.MirrorType;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
 import frc.robot.Constants.Arm.Side;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Utils;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Robot Arm Subsystem.
- * The Kotlin 'object Arm' structure is implemented as a Singleton pattern in
+ * Robot Arm Subsystem. The Kotlin 'object Arm' structure is implemented as a Singleton pattern in
  * Java.
  */
 public class ArmIOReal implements ArmIO {
@@ -52,7 +50,8 @@ public class ArmIOReal implements ArmIO {
   private final StatusSignal<Current> statorCurrentSignal = rollerMotor.getStatorCurrent();
 
   private final InterpolatingDoubleTreeMap elevatorToArm = new InterpolatingDoubleTreeMap();
-  private final InterpolatingDoubleTreeMap elevatorToArmWhenIntakeDown = new InterpolatingDoubleTreeMap();
+  private final InterpolatingDoubleTreeMap elevatorToArmWhenIntakeDown =
+      new InterpolatingDoubleTreeMap();
 
   private final double deadzoneAngle = Math.toRadians(20.0);
 
@@ -65,7 +64,7 @@ public class ArmIOReal implements ArmIO {
   // --- MUTABLE STATES ---
   private PivotState pivotState = PivotState.Up;
   private RollerState rollerState = RollerState.Off;
-  private boolean isZeroed = false;
+  private boolean zeroed = false;
   private boolean hasObject = false;
   public boolean isArmStuck = false;
   private double armOffsetRadians = 0.0;
@@ -120,15 +119,19 @@ public class ArmIOReal implements ArmIO {
   // --- POSITION AND SAFETY METHODS ---
 
   public Side getSideCloserToReef() {
-    Rotation2d directionTowardReefCenter = (Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER, rC)
-        .minus(drive.poseEstimator.getEstimatedPosition().getTranslation())).getAngle();
-    Rotation2d directionTowardRight = drive.poseEstimator.getEstimatedPosition().getRotation()
-        .rotateBy(Rotation2d.kCW_90deg);
+    Rotation2d directionTowardReefCenter =
+        (Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER, rC)
+                .minus(drive.poseEstimator.getEstimatedPosition().getTranslation()))
+            .getAngle();
+    Rotation2d directionTowardRight =
+        drive.poseEstimator.getEstimatedPosition().getRotation().rotateBy(Rotation2d.kCW_90deg);
 
     // Uses dot product formula (for unit vectors). This is always between 0 and 180
     // degrees (0 and pi radians).
-    double ang = Math.acos(directionTowardReefCenter.getCos() * directionTowardRight.getCos() +
-        directionTowardReefCenter.getSin() * directionTowardRight.getSin());
+    double ang =
+        Math.acos(
+            directionTowardReefCenter.getCos() * directionTowardRight.getCos()
+                + directionTowardReefCenter.getSin() * directionTowardRight.getSin());
 
     if (Math.PI / 2 - deadzoneAngle < ang && ang < Math.PI / 2 + deadzoneAngle) {
       return Side.Neither;
@@ -159,7 +162,8 @@ public class ArmIOReal implements ArmIO {
     double rotation = drive.poseEstimator.getEstimatedPosition().getRotation().getRadians();
 
     if ((rotation < (Math.PI / 2 + deadzoneAngle) && rotation > (Math.PI / 2 - deadzoneAngle))
-        || (rotation > (-Math.PI / 2 - deadzoneAngle) && rotation < (-Math.PI / 2 + deadzoneAngle))) {
+        || (rotation > (-Math.PI / 2 - deadzoneAngle)
+            && rotation < (-Math.PI / 2 + deadzoneAngle))) {
       return Side.Neither;
     } else if ((isOnBlue && rotation < Math.PI / 2 && rotation > -Math.PI / 2)
         || (!isOnBlue && (rotation > Math.PI / 2 || rotation < -Math.PI / 2))) {
@@ -170,9 +174,12 @@ public class ArmIOReal implements ArmIO {
   }
 
   public boolean atSafeReefDistance() {
-    return drive.poseEstimator.getEstimatedPosition().getTranslation()
-        .getDistance(
-            Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER, rC)) > Constants.Arm.SAFE_DISTANCE_FROM_REEF_CENTER;
+    return drive
+            .poseEstimator
+            .getEstimatedPosition()
+            .getTranslation()
+            .getDistance(Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER, rC))
+        > Constants.Arm.SAFE_DISTANCE_FROM_REEF_CENTER;
   }
 
   public double getDesiredPosition() {
@@ -184,8 +191,10 @@ public class ArmIOReal implements ArmIO {
     double answer;
     // long startTime = System.currentTimeMillis();
 
-    answer = positionFromAngle(pivotState.getDesiredAngle(this),
-        pivotState.mirrorType != MirrorType.ActuallyFixedAngle);
+    answer =
+        positionFromAngle(
+            pivotState.getDesiredAngle(this),
+            pivotState.mirrorType != MirrorType.ActuallyFixedAngle);
 
     // long milliseconds = System.currentTimeMillis() - startTime;
     // lastUpdatedTick = rC.tickNumber;
@@ -198,11 +207,15 @@ public class ArmIOReal implements ArmIO {
 
   public double positionFromAngle(double angle, boolean respectReef) {
     // Potential rotation positions (one in 0 to 2*PI, one in -2*PI to 0)
-    List<Double> positions = Stream.of(Utils.wrapTo0_2PI(angle), Utils.wrapTo0_2PI(angle) - 2 * Math.PI)
-        .filter(p -> (p >= Constants.Arm.ALLOWED_OPERATING_RANGE_MIN && p <= Constants.Arm.ALLOWED_OPERATING_RANGE_MAX))// Check
-                                                                                                                        // allowed
-                                                                                                                        // range
-        .collect(Collectors.toList());
+    List<Double> positions =
+        Stream.of(Utils.wrapTo0_2PI(angle), Utils.wrapTo0_2PI(angle) - 2 * Math.PI)
+            .filter(
+                p ->
+                    (p >= Constants.Arm.ALLOWED_OPERATING_RANGE_MIN
+                        && p <= Constants.Arm.ALLOWED_OPERATING_RANGE_MAX)) // Check
+            // allowed
+            // range
+            .collect(Collectors.toList());
 
     final double actualArmPosition = getPosition();
     final Side closeSide = getSideCloserToReef();
@@ -214,9 +227,13 @@ public class ArmIOReal implements ArmIO {
       switch (closeSide) {
         case Neither:
           // Choose whichever position is closest to current angle
-          p = positions.stream()
-              .min((p1, p2) -> Double.compare(Math.abs(p1 - actualArmPosition), Math.abs(p2 - actualArmPosition)))
-              .orElse(0.0);
+          p =
+              positions.stream()
+                  .min(
+                      (p1, p2) ->
+                          Double.compare(
+                              Math.abs(p1 - actualArmPosition), Math.abs(p2 - actualArmPosition)))
+                  .orElse(0.0);
           break;
         case Right:
           // Position selection based on direction of rotation near the reef (simplified)
@@ -231,19 +248,28 @@ public class ArmIOReal implements ArmIO {
       }
     } else {
       // Choose the closest position (ignoring reef for now)
-      p = positions.stream()
-          .min((p1, p2) -> Double.compare(Math.abs(p1 - actualArmPosition), Math.abs(p2 - actualArmPosition)))
-          .orElse(0.0);
+      p =
+          positions.stream()
+              .min(
+                  (p1, p2) ->
+                      Double.compare(
+                          Math.abs(p1 - actualArmPosition), Math.abs(p2 - actualArmPosition)))
+              .orElse(0.0);
     }
 
     // Reef Safety Constraint (Prevent hitting the outer frame)
     // This works because the only time we should be pivoting to a position below 90
     // degrees is when going to rest state.
     final boolean notAtSafeReefDistance = !atSafeReefDistance();
-    if (actualArmPosition > Math.PI / 2 && p < Math.PI / 2 && closeSide == Side.Right && notAtSafeReefDistance) {
+    if (actualArmPosition > Math.PI / 2
+        && p < Math.PI / 2
+        && closeSide == Side.Right
+        && notAtSafeReefDistance) {
       isArmStuck = true;
       p = Math.max(p, Math.PI - Constants.Arm.SAFE_INSIDE_ROBOT_ANGLE);
-    } else if (actualArmPosition < -Math.PI / 2 && p > -Math.PI / 2 && closeSide == Side.Left
+    } else if (actualArmPosition < -Math.PI / 2
+        && p > -Math.PI / 2
+        && closeSide == Side.Left
         && notAtSafeReefDistance) {
       isArmStuck = true;
       p = Math.min(p, -Math.PI + Constants.Arm.SAFE_INSIDE_ROBOT_ANGLE);
@@ -253,10 +279,12 @@ public class ArmIOReal implements ArmIO {
 
     // Elevator Clamping (Prevent arm hitting the elevator)
     // CLAMPING, DO NOT MOVE OR REMOVE!
-    double actualElevatorHeight = rC.subsystems.elevator.getHeight(); // Assume Elevator is a Singleton
+    double actualElevatorHeight =
+        rC.subsystems.elevator.getHeight(); // Assume Elevator is a Singleton
 
-    InterpolatingDoubleTreeMap interpolationMap = (rC.subsystems.intake
-        .getPivotState() == Constants.Intake.PivotState.Down && rC.subsystems.intake.atSetpoint())
+    InterpolatingDoubleTreeMap interpolationMap =
+        (rC.subsystems.intake.getPivotState() == Constants.Intake.PivotState.Down
+                && rC.subsystems.intake.atSetpoint())
             ? elevatorToArmWhenIntakeDown
             : elevatorToArm;
 
@@ -282,10 +310,8 @@ public class ArmIOReal implements ArmIO {
   }
 
   public void setCoastEnabled(boolean coast) {
-    if (coast)
-      armPivotMotor.setNeutralMode(NeutralModeValue.Coast);
-    else
-      armPivotMotor.setNeutralMode(NeutralModeValue.Brake);
+    if (coast) armPivotMotor.setNeutralMode(NeutralModeValue.Coast);
+    else armPivotMotor.setNeutralMode(NeutralModeValue.Brake);
   }
 
   // For when the arm skips.
@@ -294,13 +320,12 @@ public class ArmIOReal implements ArmIO {
   }
 
   public double closeClampedPosition() {
-    double x = absoluteEncoder.getPosition().getValueAsDouble()
-        - Constants.Arm.PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS;
+    double x =
+        absoluteEncoder.getPosition().getValueAsDouble()
+            - Constants.Arm.PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS;
     // Wrap encoder reading to be between -0.5 and 0.5 rotations
-    while (x < -0.5)
-      x += 1.0;
-    while (x > 0.5)
-      x -= 1.0;
+    while (x < -0.5) x += 1.0;
+    while (x > 0.5) x -= 1.0;
     double rawReadingArmRotations = x * Constants.Arm.PIVOT_ENCODER_RATIO;
 
     final double allowedOffsetArmRotations = 12.0 / 360.0;
@@ -317,7 +342,7 @@ public class ArmIOReal implements ArmIO {
 
   public void resetRelativeFromAbsolute() {
     armPivotMotor.setPosition(closeClampedPosition());
-    isZeroed = true;
+    zeroed = true;
   }
 
   // --- PERIODIC METHOD ---
@@ -343,14 +368,15 @@ public class ArmIOReal implements ArmIO {
     boolean debouncedHasCoral = coralCurrentDebouncer.calculate(undebounced);
     boolean debouncedHasAlgae = algaeCurrentDebouncer.calculate(undebounced);
 
-    hasObject = atStartOfAuto || (rollerState == RollerState.AlgaeIdle ? debouncedHasAlgae : debouncedHasCoral);
+    hasObject =
+        atStartOfAuto
+            || (rollerState == RollerState.AlgaeIdle ? debouncedHasAlgae : debouncedHasCoral);
 
-    if (!isZeroed || !rC.subsystems.elevator.isZeroed()) // Assume Elevator is a Singleton
-      return;
+    if (!isZeroed() || !rC.subsystems.elevator.isZeroed()) // Assume Elevator is a Singleton
+    return;
 
     // Roller Command
-    rollerMotor.set(
-        (atStartOfAuto ? RollerState.FastIdle.dutyCycle : rollerState.dutyCycle));
+    rollerMotor.set((atStartOfAuto ? RollerState.FastIdle.dutyCycle : rollerState.dutyCycle));
 
     // Pivot Control (Motion Magic and Gravity Feedforward)
     double positionSetpoint = getDesiredPosition();
@@ -358,25 +384,39 @@ public class ArmIOReal implements ArmIO {
 
     // TalonFX MotionMagicVoltage command, converting angle (radians) to rotation:
     // (setpoint - offset) / (2*PI)
-    armPivotMotor.setControl(new MotionMagicVoltage((positionSetpoint - armOffsetRadians) / (2 * Math.PI))
-        .withFeedForward(gravityFeedforward));
+    armPivotMotor.setControl(
+        new MotionMagicVoltage((positionSetpoint - armOffsetRadians) / (2 * Math.PI))
+            .withFeedForward(gravityFeedforward));
   }
 
+  @Override
+  public boolean isZeroed() {
+    return zeroed;
+  }
+
+  @Override
+  public void setZeroed(boolean z) {
+    this.zeroed = z;
+  }
   // --- SENDABLE LOGGING ---
 
   public void initSendable(SendableBuilder builder) {
     // Kotlin lambdas are translated to Java lambda expressions: () -> expression
     builder.addDoubleProperty("Arm offset (deg)", () -> Math.toDegrees(armOffsetRadians), null);
     builder.addDoubleProperty("Arm position (deg)", () -> Math.toDegrees(getPosition()), null);
-    builder.addDoubleProperty("Raw Encoder", () -> absoluteEncoder.getPosition().getValueAsDouble(), null);
+    builder.addDoubleProperty(
+        "Raw Encoder", () -> absoluteEncoder.getPosition().getValueAsDouble(), null);
     // // builder.addDoubleProperty("Clamped position encoder (deg)", {
     // closeClampedPosition() * 360.0 }, {})
     builder.addBooleanProperty("Has object?", () -> hasObject, null);
     // // builder.addBooleanProperty("Undebounced has object?", {
     // undebouncedHasObject}, {})
-    builder.addDoubleProperty("Desired position (deg)", () -> Math.toDegrees(getDesiredPosition()), null);
-    builder.addDoubleProperty("Motion magic setpoint (deg)",
-        () -> 360.0 * armPivotMotor.getClosedLoopReference().getValueAsDouble(), null);
+    builder.addDoubleProperty(
+        "Desired position (deg)", () -> Math.toDegrees(getDesiredPosition()), null);
+    builder.addDoubleProperty(
+        "Motion magic setpoint (deg)",
+        () -> 360.0 * armPivotMotor.getClosedLoopReference().getValueAsDouble(),
+        null);
     // // builder.addDoubleProperty("Before-safety desired angle (deg)",
     // {Math.toDegrees(pivotState.desiredAngle)}, {})
     // // builder.addStringProperty("Arm pivot state", { pivotState.toString() },

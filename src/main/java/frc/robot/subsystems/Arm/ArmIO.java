@@ -40,4 +40,8 @@ public interface ArmIO {
   void periodic();
 
   void initSendable(SendableBuilder builder);
+
+  boolean isZeroed();
+
+  void setZeroed(boolean z);
 }

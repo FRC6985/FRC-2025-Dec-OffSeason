@@ -21,8 +21,7 @@ import frc.robot.Constants.Arm.Side;
 public class Arm extends SubsystemBase implements ArmIO {
   ArmIO io;
 
-  public Arm() {
-  }
+  public Arm() {}
 
   public Arm(ArmIO io) {
     this.io = io;
@@ -110,5 +109,15 @@ public class Arm extends SubsystemBase implements ArmIO {
   @Override
   public boolean atSetpoint() {
     return io.atSetpoint();
+  }
+
+  @Override
+  public boolean isZeroed() {
+    return io.isZeroed();
+  }
+
+  @Override
+  public void setZeroed(boolean z) {
+    io.setZeroed(z);
   }
 }

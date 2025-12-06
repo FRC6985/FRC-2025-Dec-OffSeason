@@ -121,4 +121,15 @@ public class ArmIOSim implements ArmIO {
 
   }
 
+  @Override
+  public boolean isZeroed() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void setZeroed(boolean z) {
+    // TODO Auto-generated method stub
+
+  }
 }
