@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.Arm.ArmIO;
 import frc.robot.util.Utils;
 
 import java.util.Set;
@@ -51,6 +52,7 @@ public final class Constants {
                 public static final int ArmPivotMotor = 0;
                 public static final int ElevatorMainMotor = 0;
                 public static final int ElevatorFollowerMotor = 0;
+                public static final int armEncoder = 0;
         }
 
         public final class Field {
@@ -359,45 +361,121 @@ public final class Constants {
                                 .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(70.0)
                                                 .withSupplyCurrentLimit(50.0));
 
-                public static enum RollerState {
-                        In(0),
-                        AlgeaIn(0),
-                        AlgeaIdle(0),
-                        Out(0),
-                        SlowOut(0),
-                        AlgeaOut(0),
-                        Off(0);
+                public enum RollerState {
+                        Off(0.0),
+                        SlowIdle(-0.035),
+                        FastIdle(-0.1),
+                        Idle(-0.035),
+                        AlgaeIdle(-0.225),
+                        In(-1.0),
+                        SlowOut(0.075),
+                        Out(1.0),
+                        Descore(0.8);
 
-                        public final double rollingVoltage;
+                        public final double dutyCycle;
 
-                        RollerState(double rollingVoltage) {
-                                this.rollingVoltage = rollingVoltage;
+                        RollerState(double dutyCycle) {
+                                this.dutyCycle = dutyCycle;
                         }
                 }
 
+                public static double CURRENT_DRAW = 20.0;
+                public static double IDLE_CURRENT_DRAW = 10.0;
                 public static double SETPOINT_THRESHOLD = 0.1;
 
-                public static enum PivotState {
-                        AlgeaInLeft(0),
-                        AlgeaInRight(0),
-                        CoralIn(0),
-                        AlgeaOutLeft(0),
-                        AlgeaOutRight(0),
-                        ScoreCoral(0),
-                        FinishScoreCoral(0),
-                        AboveScoreCoral(0),
-                        L4ScoreCoral(0),
-                        L4FinishScoreCoral(0),
-                        Start(0);
+                public enum MirrorType {
+                        FixedAngle, ActuallyFixedAngle, ClosestToReef, ClosestToPosition, AlgaeScore, ProcessorScore
+                }
 
-                        public final double angle;
+                public enum Side {
+                        Left, Right, Neither
+                }
 
-                        PivotState(double angle) {
-                                this.angle = angle;
+                public enum PivotState {
+                        Up(Math.PI, MirrorType.FixedAngle),
+                        AlgaeUp(Math.PI, MirrorType.FixedAngle),
+                        Down(0.0, MirrorType.ActuallyFixedAngle),
+                        ScoreCoral(Math.toRadians(130.0), MirrorType.ClosestToReef),
+                        FinishScoreCoral(Math.toRadians(105.0), MirrorType.ClosestToReef),
+                        AboveScoreCoral(Math.toRadians(160.0), MirrorType.ClosestToReef),
+                        L4ScoreCoral(Math.toRadians(135.0), MirrorType.ClosestToReef),
+                        L4FinishScoreCoral(Math.toRadians(100.0), MirrorType.ClosestToReef),
+                        GetAlgae(Math.toRadians(100.0), MirrorType.ClosestToReef),
+                        PostAlgae(Math.toRadians(110.0), MirrorType.ClosestToReef),
+                        DescoreAlgae(Math.toRadians(110.0), MirrorType.ClosestToReef),
+                        SafeInsideRobotAngle(Math.PI - Constants.Arm.SAFE_INSIDE_ROBOT_ANGLE, MirrorType.ClosestToReef),
+                        PreBarge(Math.toRadians(160.0), MirrorType.AlgaeScore),
+                        BargeScore(Math.toRadians(160.0), MirrorType.AlgaeScore),
+                        Processor(Math.toRadians(70.0), MirrorType.ProcessorScore),
+                        AlgaeGroundPickup(Math.toRadians(-78.0), MirrorType.ActuallyFixedAngle), // out the left
+                        ExitAlgaeGroundPickup(Math.toRadians(-95.0), MirrorType.ActuallyFixedAngle), // out the left
+                        PopsiclePickup(Math.toRadians(-80.0), MirrorType.ActuallyFixedAngle);
+
+                        private final double rawAngle;
+                        public final MirrorType mirrorType;
+
+                        PivotState(double rawAngle, MirrorType mirrorType) {
+                                this.rawAngle = rawAngle;
+                                this.mirrorType = mirrorType;
+                        }
+
+                        // Corresponds to the 'desiredAngle' property in Kotlin
+                        public double getDesiredAngle(ArmIO armInstance) {
+                                switch (mirrorType) {
+                                        case ActuallyFixedAngle:
+                                        case FixedAngle:
+                                                return rawAngle;
+                                        case ClosestToPosition:
+                                                return (armInstance.getPosition() > 0.0) ? rawAngle : -rawAngle;
+                                        case ClosestToReef:
+                                                switch (armInstance.getSideCloserToReef()) {
+                                                        case Left:
+                                                                return -rawAngle;
+                                                        case Right:
+                                                                return rawAngle;
+                                                        case Neither:
+                                                                return (Math.abs(rawAngle) < Math.PI / 2) ? 0.0
+                                                                                : Math.PI;
+                                                }
+                                        case AlgaeScore:
+                                                switch (armInstance.getSideCloserToBarge()) {
+                                                        case Left:
+                                                                return -rawAngle;
+                                                        case Right:
+                                                                return rawAngle;
+                                                        case Neither:
+                                                                return Math.PI;
+                                                }
+                                        case ProcessorScore:
+                                                switch (armInstance.getSideCloserToProcessor()) {
+                                                        case Left:
+                                                                return -rawAngle;
+                                                        case Right:
+                                                                return rawAngle;
+                                                        case Neither:
+                                                                return Math.PI;
+                                                }
+                                }
+                                return rawAngle;
                         }
                 }
 
+                public static double POSITION_DEPENDENT_KG = 0.33;
+
+                public static final double ALLOWED_OPERATING_RANGE_MIN = Math.toRadians(-350.0);
+                public static final double ALLOWED_OPERATING_RANGE_MAX = Math.toRadians(350.0);
+
+                public static double PIVOT_ENCODER_RATIO = (36.0 / 18.0) * (36.0 / 18.0) * (60.0 / 24.0)
+                                * (12.0 / 54.0);
+
+                public static double PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS = .7209;
+
                 public static double CORAL_CENTER_OFFSET = Units.inchesToMeters(9.5);
+                public static double SAFE_DISTANCE_FROM_REEF_CENTER = Units.inchesToMeters(70.0);
+                public static double SAFE_PLACEMENT_DISTANCE = Units.inchesToMeters(60.0);
+                public static double SAFE_BARGE_DISTANCE = Units.inchesToMeters(50.0);
+                public static double SAFE_INSIDE_ROBOT_ANGLE = Math.toRadians(40.0);
+
         }
 
         public final class Elevator {
