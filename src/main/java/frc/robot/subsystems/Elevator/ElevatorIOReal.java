@@ -17,7 +17,6 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.Constants.Elevator;
 import frc.robot.Constants.Elevator.State;
-import frc.robot.Constants.Intake;
 import frc.robot.Constants.CanIds;
 
 public class ElevatorIOReal implements ElevatorIO {
