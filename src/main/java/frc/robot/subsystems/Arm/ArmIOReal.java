@@ -25,14 +25,12 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Arm.MirrorType;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
 import frc.robot.Constants.Arm.Side;
-import frc.robot.Robot;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.Utils;
 
@@ -62,14 +60,14 @@ public class ArmIOReal implements ArmIO {
   private final Debouncer algaeCurrentDebouncer = new Debouncer(0.25, Debouncer.DebounceType.kBoth);
   private final Timer autoTimer = new Timer();
 
-  private final double armOffsetIncrementRadians = Math.toRadians(0.1);
+  public final double armOffsetIncrementRadians = Math.toRadians(0.1);
 
   // --- MUTABLE STATES ---
   private PivotState pivotState = PivotState.Up;
   private RollerState rollerState = RollerState.Off;
   private boolean isZeroed = false;
   private boolean hasObject = false;
-  private boolean isArmStuck = false;
+  public boolean isArmStuck = false;
   private double armOffsetRadians = 0.0;
   private long lastUpdatedTick = -1;
   private double lastCachedValue = 0.0;
@@ -184,14 +182,14 @@ public class ArmIOReal implements ArmIO {
       return lastCachedValue;
     }
     double answer;
-    long startTime = System.currentTimeMillis();
+    // long startTime = System.currentTimeMillis();
 
     answer = positionFromAngle(pivotState.getDesiredAngle(this),
         pivotState.mirrorType != MirrorType.ActuallyFixedAngle);
 
-    long milliseconds = System.currentTimeMillis() - startTime;
-    lastUpdatedTick = rC.tickNumber;
-    lastCachedValue = answer;
+    // long milliseconds = System.currentTimeMillis() - startTime;
+    // lastUpdatedTick = rC.tickNumber;
+    // lastCachedValue = answer;
     // if (milliseconds > 5)
     // System.out.println("desired position took " + milliseconds + " ms"); //
     // Orijinal println'ı koru
