@@ -17,6 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.Constants.Elevator;
 import frc.robot.Constants.Elevator.State;
+import frc.robot.Constants.Intake;
 import frc.robot.Constants.CanIds;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -50,6 +51,29 @@ public class ElevatorIOReal implements ElevatorIO {
     // if (state.equals(PivotState.Up) && unsafeToGoUp()) state = PivotState.Down;
 
     return s;
+  }
+
+  public double getStatorCurrent() {
+    return mainMotor.getStatorCurrent().getValueAsDouble();
+  }
+
+  private boolean zeroed = false;
+
+  public boolean isZeroed() {
+    return zeroed;
+  }
+
+  public void setZeroed(boolean z) {
+    zeroed = z;
+  }
+
+  public void zero() {
+    mainMotor.setPosition(0.0);
+    zeroed = true;
+  }
+
+  public void setZeroingVoltage() {
+    mainMotor.setVoltage(Elevator.ZERO_VOLTAGE);
   }
 
   public void stop() {

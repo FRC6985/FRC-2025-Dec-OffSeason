@@ -38,4 +38,40 @@ public class ElevatorIOSim implements ElevatorIO {
     // TODO Auto-generated method stub
 
   }
+
+  @Override
+  public double getStatorCurrent() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean isZeroed() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void setZeroed(boolean z) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void setZeroingVoltage() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void stop() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void zero() {
+    // TODO Auto-generated method stub
+
+  }
 }

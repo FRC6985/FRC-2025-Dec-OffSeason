@@ -21,6 +21,18 @@ public interface ElevatorIO {
 
   boolean atSetpoint();
 
+  public boolean isZeroed();
+
+  public void setZeroed(boolean z);
+
+  public void setZeroingVoltage();
+
+  public void zero();
+
+  public void stop();
+
   public State getState();
+
+  public double getStatorCurrent();
 
 }
