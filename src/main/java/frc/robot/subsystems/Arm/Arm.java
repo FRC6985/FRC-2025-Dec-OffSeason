@@ -29,23 +29,24 @@ public class Arm extends SubsystemBase implements ArmIO {
     this.io = io;
   }
 
-  public void setState(PivotState p, RollerState r) {
-    io.setState(p, r);
+  @Override
+  public InterpolatingDoubleTreeMap getElevatorToArm() {
+    return io.getElevatorToArm();
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    io.initSendable(builder);
+  public boolean atSafeBargeDistance() {
+    return io.atSafeBargeDistance();
   }
 
   @Override
-  public void periodic() {
-    io.periodic();
+  public boolean atSafePlacementDistance() {
+    return io.atSafePlacementDistance();
   }
 
   @Override
-  public Side getSideCloserToBarge() {
-    return io.getSideCloserToBarge();
+  public boolean atSafeProcessorDistance() {
+    return io.atSafeProcessorDistance();
   }
 
   @Override
@@ -54,43 +55,18 @@ public class Arm extends SubsystemBase implements ArmIO {
   }
 
   @Override
-  public boolean getInsideFrame() {
-    return io.getInsideFrame();
-  }
-
-  @Override
-  public void offsetArm(double offset) {
-    io.offsetArm(offset);
-  }
-
-  @Override
   public double closeClampedPosition() {
     return io.closeClampedPosition();
   }
 
   @Override
-  public Side getSideCloserToReef() {
-    return io.getSideCloserToReef();
+  public double getArmOffsetRadians() {
+    return io.getArmOffsetRadians();
   }
 
   @Override
-  public double getPosition() {
-    return io.getPosition();
-  }
-
-  @Override
-  public void setCoastEnabled(boolean enabled) {
-    io.setCoastEnabled(enabled);
-  }
-
-  @Override
-  public void resetRelativeFromAbsolute() {
-    io.resetRelativeFromAbsolute();
-  }
-
-  @Override
-  public boolean getUndebouncedHasObject() {
-    return io.getUndebouncedHasObject();
+  public boolean getAtSetpoint() {
+    return io.getAtSetpoint();
   }
 
   @Override
@@ -99,8 +75,28 @@ public class Arm extends SubsystemBase implements ArmIO {
   }
 
   @Override
-  public double positionFromAngle(double angle, boolean isAbsolute) {
-    return io.positionFromAngle(angle, isAbsolute);
+  public boolean getHasObject() {
+    return io.getHasObject();
+  }
+
+  @Override
+  public PivotState getPivotState() {
+    return io.getPivotState();
+  }
+
+  @Override
+  public double getPosition() {
+    return io.getPosition();
+  }
+
+  @Override
+  public RollerState getRollerState() {
+    return io.getRollerState();
+  }
+
+  @Override
+  public Side getSideCloserToBarge() {
+    return io.getSideCloserToBarge();
   }
 
   @Override
@@ -109,8 +105,18 @@ public class Arm extends SubsystemBase implements ArmIO {
   }
 
   @Override
-  public boolean atSetpoint() {
-    return io.atSetpoint();
+  public Side getSideCloserToReef() {
+    return io.getSideCloserToReef();
+  }
+
+  @Override
+  public boolean isArmStuck() {
+    return io.isArmStuck();
+  }
+
+  @Override
+  public boolean isInsideFrame() {
+    return io.isInsideFrame();
   }
 
   @Override
@@ -119,12 +125,38 @@ public class Arm extends SubsystemBase implements ArmIO {
   }
 
   @Override
-  public void setZeroed(boolean z) {
-    io.setZeroed(z);
+  public void offsetArm(double r) {
+    io.offsetArm(r);
+
   }
 
   @Override
-  public InterpolatingDoubleTreeMap getElevatorToArm() {
-    return io.getElevatorToArm();
+  public void periodic() {
+    io.periodic();
+
   }
+
+  @Override
+  public double positionFromAngle(double angle, boolean respectReef) {
+    return io.positionFromAngle(angle, respectReef);
+  }
+
+  @Override
+  public void resetRelativeFromAbsolute() {
+    io.resetRelativeFromAbsolute();
+
+  }
+
+  @Override
+  public void setCoastEnabled(boolean coast) {
+    io.setCoastEnabled(coast);
+
+  }
+
+  @Override
+  public void setState(PivotState pivot, RollerState rollers) {
+    io.setState(pivot, rollers);
+
+  }
+
 }

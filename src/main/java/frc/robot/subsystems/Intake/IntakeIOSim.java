@@ -90,4 +90,16 @@ public class IntakeIOSim implements IntakeIO {
 
   }
 
+  @Override
+  public PivotState getEffectivePivotState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public RollerState getEffectiveRollerState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

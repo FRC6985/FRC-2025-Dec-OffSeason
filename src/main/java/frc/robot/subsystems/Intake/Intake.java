@@ -27,6 +27,16 @@ public class Intake extends SubsystemBase implements IntakeIO {
   }
 
   @Override
+  public PivotState getEffectivePivotState() {
+    return io.getEffectivePivotState();
+  }
+
+  @Override
+  public RollerState getEffectiveRollerState() {
+    return io.getEffectiveRollerState();
+  }
+
+  @Override
   public boolean hasCoral() {
     return io.hasCoral();
   }

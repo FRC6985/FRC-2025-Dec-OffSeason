@@ -27,8 +27,7 @@ public class ElevatorIOReal implements ElevatorIO {
   private boolean zeroed = false;
 
   private final InterpolatingDoubleTreeMap armToElevator = new InterpolatingDoubleTreeMap();
-  private final InterpolatingDoubleTreeMap armToElevatorWhenIntakeDown =
-      new InterpolatingDoubleTreeMap();
+  private final InterpolatingDoubleTreeMap armToElevatorWhenIntakeDown = new InterpolatingDoubleTreeMap();
   private double lastClampedSetpointForLogging = 0.0;
 
   public ElevatorIOReal(RobotContainer rC) {
@@ -101,7 +100,7 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     double tableValue;
-    if (rC.subsystems.intake.getPivotState() == Constants.Intake.PivotState.Down
+    if (rC.subsystems.intake.getEffectivePivotState() == Constants.Intake.PivotState.Down
         && rC.subsystems.intake.atSetpoint()) {
       tableValue = armToElevatorWhenIntakeDown.get(interpolationInput);
     } else {
@@ -168,8 +167,7 @@ public class ElevatorIOReal implements ElevatorIO {
       degreesAroundReefCenter += 180.0;
     }
 
-    double algaeDirection =
-        Math.toDegrees(Utils.wrapTo0_2PI(Math.toRadians(degreesAroundReefCenter - 30.0)));
+    double algaeDirection = Math.toDegrees(Utils.wrapTo0_2PI(Math.toRadians(degreesAroundReefCenter - 30.0)));
 
     if ((300.0 < algaeDirection && algaeDirection < 360.0)
         || (180.0 < algaeDirection && algaeDirection < 240.0)

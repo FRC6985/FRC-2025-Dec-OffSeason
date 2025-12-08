@@ -12,7 +12,6 @@
 // GNU General Public License for more details.
 package frc.robot.subsystems.Arm;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.Constants.Arm.PivotState;
 import frc.robot.Constants.Arm.RollerState;
@@ -21,13 +20,25 @@ import frc.robot.Constants.Arm.Side;
 public class ArmIOSim implements ArmIO {
 
   @Override
-  public boolean atSafeReefDistance() {
+  public boolean atSafeBargeDistance() {
     // TODO Auto-generated method stub
     return false;
   }
 
   @Override
-  public boolean atSetpoint() {
+  public boolean atSafePlacementDistance() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean atSafeProcessorDistance() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean atSafeReefDistance() {
     // TODO Auto-generated method stub
     return false;
   }
@@ -39,21 +50,45 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
+  public double getArmOffsetRadians() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public boolean getAtSetpoint() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
   public double getDesiredPosition() {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public boolean getInsideFrame() {
+  public boolean getHasObject() {
     // TODO Auto-generated method stub
     return false;
+  }
+
+  @Override
+  public PivotState getPivotState() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
   public double getPosition() {
     // TODO Auto-generated method stub
     return 0;
+  }
+
+  @Override
+  public RollerState getRollerState() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
@@ -75,7 +110,25 @@ public class ArmIOSim implements ArmIO {
   }
 
   @Override
-  public boolean getUndebouncedHasObject() {
+  public void initSendable(SendableBuilder builder) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public boolean isArmStuck() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean isInsideFrame() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean isZeroed() {
     // TODO Auto-generated method stub
     return false;
   }
@@ -114,29 +167,5 @@ public class ArmIOSim implements ArmIO {
   public void setState(PivotState pivot, RollerState rollers) {
     // TODO Auto-generated method stub
 
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public boolean isZeroed() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public void setZeroed(boolean z) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public InterpolatingDoubleTreeMap getElevatorToArm() {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

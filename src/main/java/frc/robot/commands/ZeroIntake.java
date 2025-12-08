@@ -28,7 +28,7 @@ public class ZeroIntake extends Command {
 
   @Override
   public boolean isFinished() {
-    return intake.velocity() < Constants.Intake.ZERO_MIN_CURRENT;
+    return intake.getVelocity() < Constants.Intake.ZERO_MIN_CURRENT;
   }
 
   @Override

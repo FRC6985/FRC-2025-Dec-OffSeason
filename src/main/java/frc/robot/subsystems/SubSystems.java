@@ -34,17 +34,16 @@ public class SubSystems {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         vision = new Vision(new VisionIOReal());
-        intake = new Intake(new IntakeIOReal());
+        intake = new Intake(new IntakeIOReal(rC));
         arm = new Arm(new ArmIOReal(rC));
         elevator = new Elevator(new ElevatorIOReal(rC));
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                vision,
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            vision,
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
         break;
 
       case SIM:
@@ -53,14 +52,14 @@ public class SubSystems {
         intake = new Intake(new IntakeIOSim());
         arm = new Arm(new ArmIOSim());
         elevator = new Elevator(new ElevatorIOSim());
-        drive =
-            new Drive(
-                new GyroIO() {},
-                vision,
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            vision,
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight));
         break;
 
       default:
@@ -68,14 +67,18 @@ public class SubSystems {
         intake = new Intake();
         arm = new Arm();
         elevator = new Elevator();
-        drive =
-            new Drive(
-                new GyroIO() {},
-                vision,
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            vision,
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            });
 
         break;
     }
