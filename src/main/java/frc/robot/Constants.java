@@ -1,13 +1,14 @@
 package frc.robot;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,42 +19,17 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.Arm.ArmIO;
 import frc.robot.util.Utils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 public final class Constants {
   public static enum Mode {
-    /** Running on a real robot. */
     REAL,
-
-    /** Running a physics simulator. */
     SIM,
-
-    /** Replaying from a log file. */
     REPLAY
   };
 
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-
-  public static final class CanIds {
-    public static final int IntakeCenteringMotor = 0;
-    public static final int IntakeRollerMotor = 0;
-    public static final int IntakePivotMotor = 0;
-    public static final int ArmRollerMotor = 0;
-    public static final int ArmPivotMotor = 0;
-    public static final int ElevatorMainMotor = 0;
-    public static final int ElevatorFollowerMotor = 0;
-    public static final int armEncoder = 0;
-  }
-
-  public static final class DioIds {
-    public static final int IntakeLineBreak = 0;
-  }
 
   public final class Field {
 
@@ -203,7 +179,6 @@ public final class Constants {
     }
   }
 
-  // Arm angle (radians) -> Elevator height (meters)
   public static final List<double[]> ARM_ELEVATOR_PAIRS = Arrays.asList(
       new double[] { Math.toRadians(7.0), 0.0 },
       new double[] { Math.toRadians(18.775917), 0.044542 },
@@ -261,225 +236,51 @@ public final class Constants {
         new Rotation3d(0.0, Math.toRadians(-20.0), Math.toRadians(180.0 - 55.0)));
   }
 
-  public final class Intake {
+  public class Arm {
+    public static final TalonFXConfiguration PIVOT_CONFIG;
 
-    public static double ZERO_VOLTAGE = -0.7;
-    public static double ZERO_MIN_CURRENT = 20.0;
-    public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.Clockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Coast))
-        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(Intake.GEAR_RATIO))
-        .withSlot0(
-            new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.0).withKP(160.0))
-        .withMotionMagic(
-            new MotionMagicConfigs()
-                .withMotionMagicJerk(2000.0)
-                .withMotionMagicAcceleration(200.0)
-                .withMotionMagicCruiseVelocity(2.0));
-
-    public static enum RollerState {
-      In(-6.0, -8.0),
-      SlowIn(-2.0, -3.0),
-      TroughOut(3.25, 0.0),
-      Out(8.0, 0.0),
-      Off(0.0, 0.0),
-      AlgaeModeIdle(0.0, 0.0),
-      OperatorControl(0.0, 0.0);
-
-      public final double rollingVoltage;
-      public final double centeringVoltage;
-
-      RollerState(double rollingVoltage, double centeringVoltage) {
-        this.rollingVoltage = rollingVoltage;
-        this.centeringVoltage = centeringVoltage;
-      }
+    static {
+      PIVOT_CONFIG = new TalonFXConfiguration();
+      PIVOT_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      PIVOT_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      PIVOT_CONFIG.Feedback.SensorToMechanismRatio = 1.0 / Arm.PIVOT_GEAR_RATIO;
+      PIVOT_CONFIG.Slot0.kS = 0.0;
+      PIVOT_CONFIG.Slot0.kV = 0.1;
+      PIVOT_CONFIG.Slot0.kA = 0.0;
+      PIVOT_CONFIG.Slot0.kG = 0.0;
+      PIVOT_CONFIG.Slot0.kP = 80.0; // volts per rotation
+      PIVOT_CONFIG.MotionMagic.MotionMagicJerk = 9999.0;
+      PIVOT_CONFIG.MotionMagic.MotionMagicAcceleration = 4.5;
+      PIVOT_CONFIG.MotionMagic.MotionMagicCruiseVelocity = 2.0; // rps
+      PIVOT_CONFIG.CurrentLimits.StatorCurrentLimit = 70.0;
+      PIVOT_CONFIG.CurrentLimits.SupplyCurrentLimit = 50.0;
     }
 
-    public static double SETPOINT_THRESHOLD = Math.toRadians(7.0);
-    public static double GEAR_RATIO = 1.0 / ((12.0 / 40.0) * (18.0 / 46.0) * (18.0 / 60.0) * (12.0 / 32.0));
-
-    public static enum PivotState {
-      Down(Math.toRadians(126.0)),
-      Trough(Math.toRadians(25.639507)),
-      Up(0.0),
-      OperatorControl(0.0);
-
-      public final double angle;
-
-      PivotState(double angle) {
-        this.angle = angle;
-      }
-    }
-  }
-
-  public final class Arm {
-    double Length = 0.0; // Arm part Length meter
-    // private static PIVOT_ENCODER_RATIO = (36.0 / 18.0) * (36.0 / 18.0) * (60.0 /
-    // 24.0) * (12.0 / 54.0)
-
-    public static double PIVOT_GEAR_RATIO = (12.0 / 60.0) * (20.0 / 60.0) * (12.0 / 54.0);
-
-    public static TalonFXConfiguration pivotConfig = new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.Clockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Brake))
-        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(1.0 / PIVOT_GEAR_RATIO))
-        .withSlot0(
-            new Slot0Configs().withKS(0.0).withKV(0.1).withKA(0.0).withKG(0.0).withKP(80.0))
-        .withMotionMagic(
-            new MotionMagicConfigs()
-                .withMotionMagicJerk(9999.0)
-                .withMotionMagicAcceleration(4.5)
-                .withMotionMagicCruiseVelocity(2.0))
-        .withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withStatorCurrentLimit(70.0)
-                .withSupplyCurrentLimit(50.0));
-
-    public enum RollerState {
-      Off(0.0),
-      SlowIdle(-0.035),
-      FastIdle(-0.1),
-      Idle(-0.035),
-      AlgaeIdle(-0.225),
-      In(-1.0),
-      SlowOut(0.075),
-      Out(1.0),
-      Descore(0.8);
-
-      public final double dutyCycle;
-
-      RollerState(double dutyCycle) {
-        this.dutyCycle = dutyCycle;
-      }
-    }
-
-    public static double CURRENT_DRAW = 20.0;
-    public static double IDLE_CURRENT_DRAW = 10.0;
-    public static double SETPOINT_THRESHOLD = 0.1;
-
-    public enum MirrorType {
-      FixedAngle,
-      ActuallyFixedAngle,
-      ClosestToReef,
-      ClosestToPosition,
-      AlgaeScore,
-      ProcessorScore
-    }
-
-    public enum Side {
-      Left,
-      Right,
-      Neither
-    }
-
-    public enum PivotState {
-      Up(Math.PI, MirrorType.FixedAngle),
-      AlgaeUp(Math.PI, MirrorType.FixedAngle),
-      Down(0.0, MirrorType.ActuallyFixedAngle),
-      ScoreCoral(Math.toRadians(130.0), MirrorType.ClosestToReef),
-      FinishScoreCoral(Math.toRadians(105.0), MirrorType.ClosestToReef),
-      AboveScoreCoral(Math.toRadians(160.0), MirrorType.ClosestToReef),
-      L4ScoreCoral(Math.toRadians(135.0), MirrorType.ClosestToReef),
-      L4FinishScoreCoral(Math.toRadians(100.0), MirrorType.ClosestToReef),
-      GetAlgae(Math.toRadians(100.0), MirrorType.ClosestToReef),
-      PostAlgae(Math.toRadians(110.0), MirrorType.ClosestToReef),
-      DescoreAlgae(Math.toRadians(110.0), MirrorType.ClosestToReef),
-      SafeInsideRobotAngle(
-          Math.PI - Constants.Arm.SAFE_INSIDE_ROBOT_ANGLE, MirrorType.ClosestToReef),
-      PreBarge(Math.toRadians(160.0), MirrorType.AlgaeScore),
-      BargeScore(Math.toRadians(160.0), MirrorType.AlgaeScore),
-      Processor(Math.toRadians(70.0), MirrorType.ProcessorScore),
-      AlgaeGroundPickup(Math.toRadians(-78.0), MirrorType.ActuallyFixedAngle), // out the left
-      ExitAlgaeGroundPickup(Math.toRadians(-95.0), MirrorType.ActuallyFixedAngle), // out the left
-      PopsiclePickup(Math.toRadians(-80.0), MirrorType.ActuallyFixedAngle);
-
-      private final double rawAngle;
-      public final MirrorType mirrorType;
-
-      PivotState(double rawAngle, MirrorType mirrorType) {
-        this.rawAngle = rawAngle;
-        this.mirrorType = mirrorType;
-      }
-
-      // Corresponds to the 'desiredAngle' property in Kotlin
-      public double getDesiredAngle(ArmIO armInstance) {
-        switch (mirrorType) {
-          case ActuallyFixedAngle:
-          case FixedAngle:
-            return rawAngle;
-          case ClosestToPosition:
-            return (armInstance.getPosition() > 0.0) ? rawAngle : -rawAngle;
-          case ClosestToReef:
-            switch (armInstance.getSideCloserToReef()) {
-              case Left:
-                return -rawAngle;
-              case Right:
-                return rawAngle;
-              case Neither:
-                return (Math.abs(rawAngle) < Math.PI / 2) ? 0.0 : Math.PI;
-            }
-          case AlgaeScore:
-            switch (armInstance.getSideCloserToBarge()) {
-              case Left:
-                return -rawAngle;
-              case Right:
-                return rawAngle;
-              case Neither:
-                return Math.PI;
-            }
-          case ProcessorScore:
-            switch (armInstance.getSideCloserToProcessor()) {
-              case Left:
-                return -rawAngle;
-              case Right:
-                return rawAngle;
-              case Neither:
-                return Math.PI;
-            }
-        }
-        return rawAngle;
-      }
-    }
-
-    public static double POSITION_DEPENDENT_KG = 0.33;
+    public static final double POSITION_DEPENDENT_KG = 0.33;
 
     public static final double ALLOWED_OPERATING_RANGE_MIN = Math.toRadians(-350.0);
     public static final double ALLOWED_OPERATING_RANGE_MAX = Math.toRadians(350.0);
 
-    public static double PIVOT_ENCODER_RATIO = (36.0 / 18.0) * (36.0 / 18.0) * (60.0 / 24.0) * (12.0 / 54.0);
+    public static final double PIVOT_ENCODER_RATIO = (36.0 / 18.0) * (36.0 / 18.0) * (60.0 / 24.0) * (12.0 / 54.0);
 
-    public static double PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS = .7209;
+    public static final double PIVOT_GEAR_RATIO = (12.0 / 60.0) * (20.0 / 60.0) * (12.0 / 54.0);
 
-    public static double CORAL_CENTER_OFFSET = Units.inchesToMeters(9.5);
-    public static double SAFE_DISTANCE_FROM_REEF_CENTER = Units.inchesToMeters(70.0);
-    public static double SAFE_PLACEMENT_DISTANCE = Units.inchesToMeters(60.0);
-    public static double SAFE_BARGE_DISTANCE = Units.inchesToMeters(50.0);
-    public static double SAFE_INSIDE_ROBOT_ANGLE = Math.toRadians(40.0);
+    public static final double PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS = -0.053;
+
+    public static final double CORAL_CENTER_OFFSET = Units.inchesToMeters(9.5);
+    public static final double SAFE_DISTANCE_FROM_REEF_CENTER = Units.inchesToMeters(70.0);
+    public static final double SAFE_PLACEMENT_DISTANCE = Units.inchesToMeters(60.0);
+    public static final double SAFE_BARGE_DISTANCE = Units.inchesToMeters(50.0);
+    public static final double SAFE_INSIDE_ROBOT_ANGLE = Math.toRadians(40.0);
+
+    public static final double SETPOINT_THRESHOLD = 0.1;
+    public static final double CURRENT_DRAW = 20.0;
+    public static final double IDLE_CURRENT_DRAW = 10.0;
   }
 
-  public final class Elevator {
-
+  public class Elevator {
     public static final double SPOOL_RADIUS = Units.inchesToMeters(0.75);
     public static final double GEAR_RATIO = 3.6;
-
-    public static TalonFXConfiguration motorConfig = new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.Clockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Brake))
-        .withFeedback(
-            new FeedbackConfigs()
-                .withSensorToMechanismRatio(GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI)))
-        .withSlot0(
-            new Slot0Configs().withKS(0.0).withKV(0.0).withKA(0.0).withKG(0.37).withKP(70.0))
-        .withMotionMagic(
-            new MotionMagicConfigs()
-                .withMotionMagicAcceleration(14.0)
-                .withMotionMagicCruiseVelocity(3.0));
 
     public static final double ZERO_VOLTAGE = -0.2;
     public static final double ZERO_MIN_CURRENT = 1.7; // amps
@@ -487,52 +288,54 @@ public final class Constants {
     public static final double SETPOINT_THRESHOLD = 0.01;
     public static final double LAZIER_SETPOINT_THRESHOLD = 0.03;
 
-    // public static final double COLLISION_AVOIDANCE_MARGIN = 1.0;
+    public static final double COLLISION_AVOIDANCE_MARGIN = 1.0;
 
     public static final double MAX_EXTENSION = Units.inchesToMeters(55.0);
 
     public static final double SAFE_HEIGHT = 0.837198 - 0.01;
 
-    public static enum State {
-      Down(0.0),
-      PreHandoff(Units.inchesToMeters(36.0)),
-      Handoff(Units.inchesToMeters(33.25)),
-      SourceIntake(Units.inchesToMeters(53.0)),
-      PreScore(Units.inchesToMeters(20.0)),
-      Trough(Units.inchesToMeters(38.0)),
-      L2(Units.inchesToMeters(15.0)),
-      L3(L2.rawExtension + Units.inchesToMeters(15.8701)),
-      L4(Units.inchesToMeters(54.5 - 0.125)),
-      Barge(Units.inchesToMeters(55.0 - 0.125)),
-      ScoreL4(L4.rawExtension - Units.inchesToMeters(1.0)),
-      ScoreL3(L3.rawExtension - Units.inchesToMeters(3.5)),
-      ScoreL2(L2.rawExtension - Units.inchesToMeters(3.5)),
-      PostL3(L2.rawExtension - Units.inchesToMeters(6.0)), // TODO: Tune
-      PostL2(L2.rawExtension - Units.inchesToMeters(3.5)), // TODO: Tune
-      AutoAlgae(Units.inchesToMeters(21.75)),
-      LowAlgae(Units.inchesToMeters(22.25)),
-      HighAlgae(LowAlgae.rawExtension + Units.inchesToMeters(15.8701)),
-      Processor(Units.inchesToMeters(20.0)),
-      AlgaeRest(Units.inchesToMeters(15.0)),
-      GroundAlgaeIntake(0.14),
-      PopsiclePickup(0.065);
+    public static final TalonFXConfiguration MOTOR_CONFIG;
 
-      public final double rawExtension;
-
-      State(double rawExtension) {
-        this.rawExtension = rawExtension;
-      }
-    }
-
-    public static enum AlgaeHeight {
-      High(Units.inchesToMeters(15.8701)),
-      Low(0.0);
-
-      public final double offset;
-
-      AlgaeHeight(double offset) {
-        this.offset = offset;
-      }
+    static {
+      MOTOR_CONFIG = new TalonFXConfiguration();
+      MOTOR_CONFIG.Feedback.SensorToMechanismRatio = GEAR_RATIO / (SPOOL_RADIUS * 2 * Math.PI);
+      MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      MOTOR_CONFIG.Slot0.kS = 0.0;
+      MOTOR_CONFIG.Slot0.kV = 0.0;
+      MOTOR_CONFIG.Slot0.kA = 0.0;
+      MOTOR_CONFIG.Slot0.kG = 0.37;
+      MOTOR_CONFIG.Slot0.kP = 70.0;
+      // MOTOR_CONFIG.MotionMagic.MotionMagicJerk = 9999.0;
+      MOTOR_CONFIG.MotionMagic.MotionMagicAcceleration = 14.0;
+      MOTOR_CONFIG.MotionMagic.MotionMagicCruiseVelocity = 3.0;
     }
   }
+
+  public class Intake {
+    public static final TalonFXConfiguration PIVOT_CONFIG;
+
+    static {
+      PIVOT_CONFIG = new TalonFXConfiguration();
+      PIVOT_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      PIVOT_CONFIG.Feedback.SensorToMechanismRatio = Intake.GEAR_RATIO;
+      PIVOT_CONFIG.Slot0.kS = 0.0;
+      PIVOT_CONFIG.Slot0.kV = 0.0;
+      PIVOT_CONFIG.Slot0.kA = 0.0;
+      PIVOT_CONFIG.Slot0.kG = 0.0;
+      PIVOT_CONFIG.Slot0.kP = 160.0;
+      PIVOT_CONFIG.MotionMagic.MotionMagicJerk = 2000.0;
+      PIVOT_CONFIG.MotionMagic.MotionMagicAcceleration = 200.0;
+      PIVOT_CONFIG.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+      PIVOT_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    }
+
+    private static final double GEAR_RATIO = 1.0 / ((12.0 / 40.0) * (18.0 / 46.0) * (18.0 / 60.0) * (12.0 / 32.0));
+    public static final double ZERO_VOLTAGE = -0.7;
+    public static final double ZERO_MIN_CURRENT = 20.0; // amps
+
+    public static final double SETPOINT_THRESHOLD = Math.toRadians(7.0);
+    public static final double ULTRASONIC_SENSOR_THRESHOLD = 0.02;
+  }
+
 }
