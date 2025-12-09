@@ -15,6 +15,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -51,6 +52,16 @@ public class Robot extends LoggedRobot {
 
   public boolean isOnRedSide() {
     return drive.poseEstimator.getEstimatedPosition().getX() > (Constants.Field.FIELD_X_SIZE / 2);
+  }
+
+  public Pose2d getEstimatedPose() {
+    return drive.poseEstimator.getEstimatedPosition();
+  }
+
+  private int tickNumber = 0;
+
+  public int getTickNumber() {
+    return tickNumber;
   }
 
   public Robot() {

@@ -31,6 +31,50 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
+  public static final class CanIds {
+
+    public static int ARM_ENCODER = 0;
+    public static int ARM_PIVOT_MOTOR = 0;
+    public static int ARM_ROLLER_MOTOR = 0;
+    public static int ELEVATOR_MAIN_MOTOR = 0;
+    public static int ELEVATOR_FOLLOWER_MOTOR = 0;
+    public static int INTAKE_PIVOT_MOTOR = 0;
+    public static int INTAKE_ROLLER_MOTOR = 0;
+    public static int INTAKE_CENTERING_MOTOR = 0;
+
+  }
+
+  public static final class DioIds {
+
+    public static int INTAKE_LINEBREAK = 0;
+
+  }
+
+  public static final class Extra {
+    public static double WHEEL_RADIUS = Units.inchesToMeters(3.9 / 2);
+    public static double DRIVE_RATIO = 1.0 / ((16.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0));
+    public static double TURN_RATIO = 150.0 / 7.0;
+    public static int INTAKE_LINEBREAK = 0;
+    public static double maxAlignTranslationSpeed = 1.5;
+    public static double maxAlignRotationSpeed = 2.5;
+    public static double maxBargeAlignTranslationSpeed = 1.5;
+    public static double maxBargeAlignRotationSpeed = 1.5;
+    public static double MAX_NODE_DISTANCE = 3.0; // meters
+    // How fast the robot can move in a straight line (meters/sec).
+    public static double MAX_VELOCITY = (5800.0 / 60) / DRIVE_RATIO * WHEEL_RADIUS * 2 * Math.PI;
+    // How far the swerve modules are from (0,0).
+    public static double XY_DISTANCE = Units.inchesToMeters(13.393747);
+    // How fast the robot can rotate (radians/sec).
+    public static double MAX_ANGULAR_VELOCITY = MAX_VELOCITY / (XY_DISTANCE * Math.sqrt(2.0));
+
+    public static double CHASSIS_RADIUS = (XY_DISTANCE * Math.sqrt(2.0));
+
+    public static double ALIGN_ANGLE_WEIGHT = 2.7;
+    public static double ALIGN_TRANSLATION_WEIGHT = 5.0;
+    public static double ALREADY_SCORED_BADNESS = 0.5
+        + Units.inchesToMeters(12.9375) * ALIGN_TRANSLATION_WEIGHT * (1 - 2 * 0.3);
+  }
+
   public final class Field {
 
     public static final double FIELD_X_SIZE = 17.548249;
@@ -179,7 +223,7 @@ public final class Constants {
     }
   }
 
-  public static final List<double[]> ARM_ELEVATOR_PAIRS = Arrays.asList(
+  public static final List<double[]> armElevatorPairs = Arrays.asList(
       new double[] { Math.toRadians(7.0), 0.0 },
       new double[] { Math.toRadians(18.775917), 0.044542 },
       new double[] { Math.toRadians(26.241907), 0.068086 },
@@ -201,7 +245,7 @@ public final class Constants {
       new double[] { Math.toRadians(180.0 - 40.585547), 0.802161 - 0.0254 },
       new double[] { Math.toRadians(180.0), Elevator.SAFE_HEIGHT });
 
-  public static final List<double[]> ARM_INTERPOLATION_INTAKE_DOWN = Arrays.asList(
+  public static final List<double[]> armInterpolationIntakeDown = Arrays.asList(
       new double[] { Math.toRadians(88.0), 0.0 },
       new double[] { Math.toRadians(103.296), 0.12 },
       new double[] { Math.toRadians(113.75), 0.202 },
