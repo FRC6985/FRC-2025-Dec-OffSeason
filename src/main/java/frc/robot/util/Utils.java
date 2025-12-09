@@ -12,7 +12,8 @@ import frc.robot.RobotContainer;
 
 public final class Utils {
 
-  private Utils() {}
+  private Utils() {
+  }
 
   // ----------------------------------------
   // Deadzone utilities
@@ -20,9 +21,12 @@ public final class Utils {
 
   /** Fancy deadzone: scales input from 0.0 -> 1.0 */
   public static double deadZone(double input, double zone) {
-    if (Math.abs(input) < zone) return 0.0;
-    if (input > 1.0) return 1.0;
-    if (input < -1.0) return -1.0;
+    if (Math.abs(input) < zone)
+      return 0.0;
+    if (input > 1.0)
+      return 1.0;
+    if (input < -1.0)
+      return -1.0;
     return (input - zone) / (1.0 - zone);
   }
 
@@ -88,18 +92,32 @@ public final class Utils {
   // ----------------------------------------
   public static void addClosedLoopProperties(String name, TalonFX motor, SendableBuilder builder) {
     builder.addDoubleProperty(
-        name + " voltage (V)", () -> motor.getMotorVoltage().getValueAsDouble(), (__) -> {});
+        name + " voltage (V)", () -> motor.getMotorVoltage().getValueAsDouble(), (__) -> {
+        });
     // builder.addDoubleProperty(name + " supply Current (A)", () ->
     // motor.getSupplyCurrent().getValueAsDouble(), () -> {});
     // builder.addDoubleProperty(name + " stator Current (A)", () ->
     // motor.getStatorCurrent().getValueAsDouble(), () -> {});
     builder.addDoubleProperty(
-        name + " raw velocity", () -> motor.getVelocity().getValueAsDouble(), (__) -> {});
+        name + " raw velocity", () -> motor.getVelocity().getValueAsDouble(), (__) -> {
+        });
     builder.addDoubleProperty(
-        name + " raw acceleration", () -> motor.getAcceleration().getValueAsDouble(), (__) -> {});
+        name + " raw acceleration", () -> motor.getAcceleration().getValueAsDouble(), (__) -> {
+        });
     // builder.addDoubleProperty(name + " position", () ->
     // motor.getPosition().getValueAsDouble(), () -> {});
     // builder.addDoubleProperty(name + " motion magic setpoint*360", () ->
     // motor.getClosedLoopReference().getValueAsDouble()*360.0, () -> {});
+  }
+
+  public static boolean atGoodScoringDistance(RobotContainer rC) {
+    double BARGE_SCORING_POSITION_TOLERANCE = .1;
+    Pose2d estimatedPose = rC.subsystems.drive.poseEstimator.getEstimatedPosition();
+    if (!rC.isOnRedSide())
+      return estimatedPose.getX() > Constants.Field.BLUE_BARGE_SCORING_X - BARGE_SCORING_POSITION_TOLERANCE
+          && estimatedPose.getX() < Constants.Field.BLUE_BARGE_SCORING_X + BARGE_SCORING_POSITION_TOLERANCE;
+    else
+      return estimatedPose.getX() > Constants.Field.RED_BARGE_SCORING_X - BARGE_SCORING_POSITION_TOLERANCE
+          && estimatedPose.getX() < Constants.Field.RED_BARGE_SCORING_X + BARGE_SCORING_POSITION_TOLERANCE;
   }
 }

@@ -1,24 +1,18 @@
 package frc.robot.subsystems.SuperStructure;
 
+import java.util.function.Supplier;
+
 public class SuperstructureTransition {
-
-    public interface Condition {
-        boolean check();
-    }
-
-    public interface EnterFunction {
-        void run();
-    }
 
     public final SuperstructureState current;
     public final SuperstructureState next;
-    public final EnterFunction enterFunction;
-    public final Condition condition;
+    public final Runnable enterFunction;
+    public final Supplier<Boolean> condition;
 
     public SuperstructureTransition(SuperstructureState current,
             SuperstructureState next,
-            EnterFunction enterFunction,
-            Condition condition) {
+            Runnable enterFunction,
+            Supplier<Boolean> condition) {
         this.current = current;
         this.next = next;
         this.enterFunction = enterFunction;
@@ -27,7 +21,7 @@ public class SuperstructureTransition {
 
     public SuperstructureTransition(SuperstructureState current,
             SuperstructureState next,
-            Condition condition) {
+            Supplier<Boolean> condition) {
         this(current, next, () -> {
         }, condition);
     }

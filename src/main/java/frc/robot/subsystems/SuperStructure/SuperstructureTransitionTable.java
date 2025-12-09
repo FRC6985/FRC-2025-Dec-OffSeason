@@ -2,6 +2,7 @@ package frc.robot.subsystems.SuperStructure;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
@@ -9,6 +10,7 @@ import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.SuperStructure.SuperstructureInputs.ScoringLevel;
+import frc.robot.util.Utils;
 import frc.robot.Constants;
 
 public class SuperstructureTransitionTable {
@@ -67,10 +69,10 @@ public class SuperstructureTransitionTable {
         add(SuperstructureState.Rest, SuperstructureState.PreTrough,
                 () -> ss.getInputs().wantExtend &&
                         ss.getInputs().wantedScoringLevel == ScoringLevel.TROUGH &&
-                        Elevator.atSetpoint && Arm.atSetpoint);
+                        Elevator.atSetpoint() && Arm.getAtSetpoint());
 
         add(SuperstructureState.PreTrough, SuperstructureState.Trough,
-                () -> Intake.atSetpoint && ss.getInputs().wantScore);
+                () -> Intake.atSetpoint() && ss.getInputs().wantScore);
 
         add(SuperstructureState.PreTrough, SuperstructureState.Rest,
                 () -> !ss.getInputs().wantExtend);
@@ -80,19 +82,19 @@ public class SuperstructureTransitionTable {
 
         // PreHandoff
         add(SuperstructureState.Rest, SuperstructureState.PreHandoff,
-                () -> Elevator.atSetpoint && Arm.atSetpoint &&
+                () -> Elevator.atSetpoint() && Arm.getAtSetpoint() &&
                         ss.getInputs().wantedScoringLevel != ScoringLevel.TROUGH &&
-                        Intake.hasCoral);
+                        Intake.hasCoral());
 
         // Handoff
         add(SuperstructureState.PreHandoff, SuperstructureState.Handoff,
-                () -> Elevator.atSetpoint && Arm.atSetpoint && Intake.atSetpoint);
+                () -> Elevator.atSetpoint() && Arm.getAtSetpoint() && Intake.atSetpoint());
 
         add(SuperstructureState.Handoff, SuperstructureState.Rest,
-                () -> Arm.hasObject);
+                () -> Arm.getHasObject());
 
         add(SuperstructureState.Rest, SuperstructureState.PreScore,
-                () -> Arm.hasObject &&
+                () -> Arm.getHasObject() &&
                         ss.getInputs().wantedScoringLevel != ScoringLevel.TROUGH);
 
         add(SuperstructureState.Handoff, SuperstructureState.Rest,
@@ -132,31 +134,31 @@ public class SuperstructureTransitionTable {
         // ----------------------------------------------------
 
         add(SuperstructureState.AlgaeExit, SuperstructureState.PreGetAlgae,
-                () -> ss.getInputs().wantGetAlgae && !Arm.hasObject);
+                () -> ss.getInputs().wantGetAlgae && !Arm.getHasObject());
 
         add(SuperstructureState.Rest, SuperstructureState.PreGetAlgae,
-                () -> ss.getInputs().wantGetAlgae && !Arm.hasObject);
+                () -> ss.getInputs().wantGetAlgae && !Arm.getHasObject());
 
         add(SuperstructureState.PreGetAlgae, SuperstructureState.Rest,
                 () -> !ss.getInputs().wantGetAlgae);
 
         add(SuperstructureState.PreGetAlgae, SuperstructureState.GetAlgae,
-                () -> Elevator.atSetpoint);
+                () -> Elevator.atSetpoint());
 
         add(SuperstructureState.GetAlgae, SuperstructureState.PreGetAlgae,
                 () -> !ss.getInputs().wantGetAlgae);
 
         add(SuperstructureState.GetAlgae, SuperstructureState.PostGetAlgae,
-                () -> Arm.hasObject);
+                () -> Arm.getHasObject());
 
         add(SuperstructureState.PostGetAlgae, SuperstructureState.AlgaeRest,
-                () -> Arm.atSetpoint && Arm.atSafeReefDistance());
+                () -> Arm.getAtSetpoint() && Arm.atSafeReefDistance());
 
         add(SuperstructureState.AlgaeRest, SuperstructureState.AlgaeExit,
-                () -> !Arm.hasObject);
+                () -> !Arm.getHasObject());
 
         add(SuperstructureState.AlgaeExit, SuperstructureState.Rest,
-                () -> Arm.atSetpoint && Elevator.atSetpoint);
+                () -> Arm.getAtSetpoint() && Elevator.atSetpoint());
 
         // Algae → Barge
         add(SuperstructureState.AlgaeRest, SuperstructureState.PreBarge,
@@ -166,10 +168,10 @@ public class SuperstructureTransitionTable {
                 () -> !ss.getInputs().wantExtend);
 
         add(SuperstructureState.PreBarge, SuperstructureState.ScoreBarge,
-                () -> ss.getInputs().wantScore && Swerve.atGoodScoringDistance);
+                () -> ss.getInputs().wantScore && Utils.atGoodScoringDistance(rC));
 
         add(SuperstructureState.ScoreBarge, SuperstructureState.PreBarge,
-                () -> (!ss.getInputs().wantExtend || !Arm.hasObject) &&
+                () -> (!ss.getInputs().wantExtend || !Arm.getHasObject()) &&
                         Arm.atSafeBargeDistance());
 
         // Algae Descore
@@ -188,7 +190,7 @@ public class SuperstructureTransitionTable {
 
         add(SuperstructureState.ScoreProcessor, SuperstructureState.AlgaeRest,
                 () -> !ss.getInputs().wantScoreProcessor &&
-                        !Arm.hasObject &&
+                        !Arm.getHasObject() &&
                         Arm.atSafeProcessorDistance());
 
         add(SuperstructureState.PreProcessor, SuperstructureState.AlgaeRest,
@@ -197,34 +199,34 @@ public class SuperstructureTransitionTable {
 
         // Ground algae intake
         add(SuperstructureState.Rest, SuperstructureState.PreAlgaeGroundIntake,
-                () -> ss.getInputs().wantAlgaeGroundIntake && !Arm.hasObject);
+                () -> ss.getInputs().wantAlgaeGroundIntake && !Arm.getHasObject());
 
         add(SuperstructureState.PreAlgaeGroundIntake, SuperstructureState.AlgaeGroundIntake,
-                () -> ss.getInputs().wantAlgaeGroundIntake && Intake.atSetpoint);
+                () -> ss.getInputs().wantAlgaeGroundIntake && Intake.atSetpoint());
 
         add(SuperstructureState.AlgaeGroundIntake, SuperstructureState.ExitAlgaeGroundIntake,
-                () -> !ss.getInputs().wantAlgaeGroundIntake || Arm.hasObject);
+                () -> !ss.getInputs().wantAlgaeGroundIntake || Arm.getHasObject());
 
         add(SuperstructureState.ExitAlgaeGroundIntake, SuperstructureState.AlgaeRest,
-                () -> Elevator.atSetpoint && Arm.atSetpoint);
+                () -> Elevator.atSetpoint() && Arm.getAtSetpoint());
 
         // Popsicle pickup
         add(SuperstructureState.PopsiclePickup, SuperstructureState.PrePopsiclePickup,
                 () -> !ss.getInputs().wantPopsiclePickup ||
-                        (Robot.isAutonomous &&
-                                ss.stateTimer.hasElapsed(POPSICLE_DELAY)));
+                        (rC.robot.isAutonomous() &&
+                                ss.timer.hasElapsed(POPSICLE_DELAY)));
 
         add(SuperstructureState.PrePopsiclePickup, SuperstructureState.Rest,
                 () -> !ss.getInputs().wantPopsiclePickup);
 
         add(SuperstructureState.Rest, SuperstructureState.PrePopsiclePickup,
-                () -> ss.getInputs().wantPopsiclePickup && !Arm.hasObject);
+                () -> ss.getInputs().wantPopsiclePickup && !Arm.getHasObject());
 
         add(SuperstructureState.PrePopsiclePickup, SuperstructureState.PopsiclePickup,
-                () -> ss.getInputs().wantPopsiclePickup && Intake.atSetpoint);
+                () -> ss.getInputs().wantPopsiclePickup && Intake.atSetpoint());
 
         add(SuperstructureState.PopsiclePickup, SuperstructureState.PreScore,
-                () -> ss.stateTimer.hasElapsed(POPSICLE_DELAY) && Arm.hasObject);
+                () -> ss.stateTimer.hasElapsed(POPSICLE_DELAY) && Arm.getHasObject());
     }
 
     // ----------------------------------------------------
@@ -239,49 +241,49 @@ public class SuperstructureTransitionTable {
             SuperstructureState after) {
         // Exit paths
         add(prepare, SuperstructureState.PreScore,
-                () -> Arm.atSetpoint &&
-                        (!Arm.hasObject ||
+                () -> Arm.getAtSetpoint() &&
+                        (!Arm.getHasObject() ||
                                 !ss.getInputs().wantExtend ||
                                 ss.getInputs().wantedScoringLevel != lvl));
 
         add(start, prepare,
                 () -> !ss.getInputs().wantExtend ||
                         ss.getInputs().wantedScoringLevel != lvl ||
-                        !Arm.hasObject);
+                        !Arm.getHasObject());
 
         // Main transitions
         add(prepare, start,
-                () -> Elevator.lazierAtSetpoint &&
-                        Arm.hasObject &&
+                () -> Elevator.lazierAtSetpoint() &&
+                        Arm.getHasObject() &&
                         ss.getInputs().wantExtend &&
                         ss.getInputs().wantedScoringLevel == lvl);
 
         add(start, place,
-                () -> Elevator.atSetpoint && Arm.atSetpoint && ss.getInputs().wantScore,
+                () -> Elevator.atSetpoint() && Arm.getAtSetpoint() && ss.getInputs().wantScore,
                 () -> Swerve.markPoseScored());
 
         add(place, after,
-                () -> Elevator.atSetpoint &&
-                        Arm.atSetpoint &&
+                () -> Elevator.atSetpoint() &&
+                        Arm.getAtSetpoint() &&
                         ((place == SuperstructureState.PlaceL2 || place == SuperstructureState.PlaceL3)
                                 ? Arm.atSafePlacementDistance()
                                 : true));
 
         add(after, SuperstructureState.Rest,
-                () -> Arm.insideFrame);
+                () -> Arm.isInsideFrame());
     }
 
     // ----------------------------------------------------
     // Simpler add() overloads
     // ----------------------------------------------------
 
-    private void add(SuperstructureState cur, SuperstructureState next, Condition cond) {
-        transitions.add(new SuperstructureTransition(cur, next, cond, () -> {
-        }));
+    private void add(SuperstructureState cur, SuperstructureState next, Supplier<Boolean> cond) {
+        transitions.add(new SuperstructureTransition(cur, next, () -> {
+        }, cond));
     }
 
-    private void add(SuperstructureState cur, SuperstructureState next, Condition cond, Runnable enter) {
-        transitions.add(new SuperstructureTransition(cur, next, cond, enter));
+    private void add(SuperstructureState cur, SuperstructureState next, Supplier<Boolean> cond, Runnable enter) {
+        transitions.add(new SuperstructureTransition(cur, next, enter, cond));
     }
 
     public List<SuperstructureTransition> getTransitions() {

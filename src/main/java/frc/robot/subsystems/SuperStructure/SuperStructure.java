@@ -13,7 +13,7 @@ public class SuperStructure extends SubsystemBase {
     private final SuperstructureTransitionTable transitionTable;
 
     private SuperstructureState state = SuperstructureState.StartPosition;
-    private final Timer timer = new Timer();
+    public final Timer timer = new Timer();
 
     private SuperstructureInputs inputs = new SuperstructureInputs();
     private final Arm arm;
