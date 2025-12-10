@@ -1,187 +1,236 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Superstructure;
 
 public class Controls {
-    private static final Controls INSTANCE = new Controls();
+  private static final Controls INSTANCE = new Controls();
 
-    public static Controls getInstance() {
-        return INSTANCE;
+  public static Controls getInstance() {
+    return INSTANCE;
+  }
+
+  // Enums
+  public enum AlignMode {
+    None,
+    ReefAlign,
+    TroughAlign,
+    AlgaeAlign,
+    BargeAlign
+  }
+
+  // Controllers
+  public final XboxController driverController;
+  public final XboxController operatorController;
+  /*
+   * PS5 Controller yerine artık ikinci XboxController kullanıyoruz.
+   */
+
+  // State
+  public Superstructure.ScoringLevel lastScoringLevel = Superstructure.ScoringLevel.TROUGH;
+
+  // Data class for drive inputs
+  public static class DriveInputs {
+    public final double forward;
+    public final double left;
+    public final double rotation;
+    public final double deadzone;
+    public final AlignMode alignMode;
+
+    public DriveInputs(double forward, double left, double rotation, double deadzone, AlignMode alignMode) {
+      this.forward = forward;
+      this.left = left;
+      this.rotation = rotation;
+      this.deadzone = deadzone;
+      this.alignMode = alignMode;
     }
 
-    // Enums
-    public enum AlignMode {
-        None,
-        ReefAlign,
-        TroughAlign,
-        AlgaeAlign,
-        BargeAlign
+    public boolean isNonZero() {
+      return Math.abs(forward) > deadzone
+          || Math.abs(left) > deadzone
+          || Math.abs(rotation) > deadzone;
     }
 
-    // Controllers
-    private final CommandGenericHID driverController;
-    public final CommandPS5Controller operatorController;
+    public DriveInputs redFlipped() {
+      return new DriveInputs(-forward, -left, rotation, deadzone, alignMode);
+    }
+  }
 
-    // State
-    public Superstructure.ScoringLevel lastScoringLevel = Superstructure.ScoringLevel.TROUGH;
+  // Empty inputs constant
+  public static final DriveInputs EMPTY_INPUTS = new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
 
-    // Data class for drive inputs
-    public static class DriveInputs {
-        public final double forward;
-        public final double left;
-        public final double rotation;
-        public final double deadzone;
-        public final AlignMode alignMode;
+  // Constructor
+  private Controls() {
+    driverController = new XboxController(0);
+    operatorController = new XboxController(1); // PS5 yerine 2. Xbox
+  }
 
-        public DriveInputs(double forward, double left, double rotation, double deadzone, AlignMode alignMode) {
-            this.forward = forward;
-            this.left = left;
-            this.rotation = rotation;
-            this.deadzone = deadzone;
-            this.alignMode = alignMode;
-        }
-
-        public boolean isNonZero() {
-            return Math.abs(forward) > deadzone || Math.abs(left) > deadzone || Math.abs(rotation) > deadzone;
-        }
-
-        public DriveInputs redFlipped() {
-            return new DriveInputs(-forward, -left, rotation, deadzone, alignMode);
-        }
+  // Driver inputs
+  public DriveInputs getDriverInputs() {
+    AlignMode alignMode;
+    if (wantBargeAutoAlign()) {
+      alignMode = AlignMode.BargeAlign;
+    } else if (wantCoralAutoAlign()
+        && getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
+      alignMode = AlignMode.ReefAlign;
+    } else if (wantCoralAutoAlign()
+        && getSuperstructureInputs().wantedScoringLevel == Superstructure.ScoringLevel.TROUGH) {
+      alignMode = AlignMode.TroughAlign;
+    } else if (wantAlgaeAutoAlign()
+        && getSuperstructureInputs().wantGetAlgae
+        && !Arm.getInstance().isArmStuck) {
+      alignMode = AlignMode.AlgaeAlign;
+    } else {
+      alignMode = AlignMode.None;
     }
 
-    // Empty inputs constant
-    public static final DriveInputs EMPTY_INPUTS = new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
+    return new DriveInputs(
+        driverController.getRawAxis(1), // left stick Y
+        -driverController.getRawAxis(0), // left stick X
+        -driverController.getRawAxis(4), // right stick X (turn)
+        0.05,
+        alignMode);
+  }
 
-    // Constructor
-    private Controls() {
-        driverController = new CommandGenericHID(0);
-        operatorController = new CommandPS5Controller(1);
+  // Operator inputs — Xbox eşleştirme açıklamaları eklendi
+  public DriveInputs getOperatorInputs() {
+    AlignMode alignMode;
+    if (wantBargeAutoAlign()) {
+      alignMode = AlignMode.BargeAlign;
+    } else if (wantCoralAutoAlign()
+        && getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
+      alignMode = AlignMode.ReefAlign;
+    } else if (wantCoralAutoAlign()
+        && getSuperstructureInputs().wantedScoringLevel == Superstructure.ScoringLevel.TROUGH) {
+      alignMode = AlignMode.TroughAlign;
+    } else if (wantAlgaeAutoAlign()
+        && getSuperstructureInputs().wantGetAlgae
+        && !Arm.getInstance().isArmStuck) {
+      alignMode = AlignMode.AlgaeAlign;
+    } else {
+      alignMode = AlignMode.None;
     }
 
-    // Driver inputs
-    public DriveInputs getDriverInputs() {
-        AlignMode alignMode;
-        if (wantBargeAutoAlign()) {
-            alignMode = AlignMode.BargeAlign;
-        } else if (wantCoralAutoAlign() &&
-                getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
-            alignMode = AlignMode.ReefAlign;
-        } else if (wantCoralAutoAlign() &&
-                getSuperstructureInputs().wantedScoringLevel == Superstructure.ScoringLevel.TROUGH) {
-            alignMode = AlignMode.TroughAlign;
-        } else if (wantAlgaeAutoAlign() &&
-                getSuperstructureInputs().wantGetAlgae &&
-                !Arm.getInstance().isArmStuck) {
-            alignMode = AlignMode.AlgaeAlign;
-        } else {
-            alignMode = AlignMode.None;
-        }
+    return new DriveInputs(
+        -operatorController.getRawAxis(1), // left stick Y
+        -operatorController.getRawAxis(0), // left stick X
+        -operatorController.getRawAxis(4), // right stick X
+        0.1,
+        alignMode);
+  }
 
-        return new DriveInputs(
-                driverController.getRawAxis(2),
-                -driverController.getRawAxis(3),
-                -driverController.getRawAxis(0),
-                0.05,
-                alignMode);
+  // Auto-align conditions
+  public boolean wantCoralAutoAlign() {
+    return getSuperstructureInputs().wantExtend;
+  }
+
+  public boolean wantAlgaeAutoAlign() {
+    return getSuperstructureInputs().wantGetAlgae
+        && Arm.getInstance().isAtSetpoint()
+        && Elevator.getInstance().isAtSetpoint();
+  }
+
+  public boolean wantBargeAutoAlign() {
+    return getSuperstructureInputs().wantExtend
+        && (Superstructure.getInstance().state == Superstructure.State.AlgaeRest
+            || Superstructure.getInstance().state == Superstructure.State.PreBarge
+            || Superstructure.getInstance().state == Superstructure.State.ScoreBarge);
+  }
+
+  // Offset arm inputs
+  public boolean wantOffsetArmPositive() {
+    return operatorController.getRawAxis(0) > 0.9
+        && operatorController.getLeftStickButton();
+  }
+
+  public boolean wantOffsetArmNegative() {
+    return operatorController.getRawAxis(0) < -0.9
+        && operatorController.getLeftStickButton();
+  }
+
+  // Superstructure inputs (PS5 tuşları → Xbox eşleştirmeleri yorumlandı)
+  public Superstructure.SuperstructureInputs getSuperstructureInputs() {
+    int pov = operatorController.getPOV();
+    Superstructure.ScoringLevel level;
+
+    switch (pov) {
+      case 0:
+        level = Superstructure.ScoringLevel.L4;
+        break;
+      case 270:
+        level = Superstructure.ScoringLevel.L3;
+        break;
+      case 180:
+        level = Superstructure.ScoringLevel.L2;
+        break;
+      case 90:
+        level = Superstructure.ScoringLevel.TROUGH;
+        break;
+      default:
+        level = lastScoringLevel;
     }
+    lastScoringLevel = level;
 
-    // Operator inputs
-    public DriveInputs getOperatorInputs() {
-        AlignMode alignMode;
-        if (wantBargeAutoAlign()) {
-            alignMode = AlignMode.BargeAlign;
-        } else if (wantCoralAutoAlign() &&
-                getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
-            alignMode = AlignMode.ReefAlign;
-        } else if (wantCoralAutoAlign() &&
-                getSuperstructureInputs().wantedScoringLevel == Superstructure.ScoringLevel.TROUGH) {
-            alignMode = AlignMode.TroughAlign;
-        } else if (wantAlgaeAutoAlign() &&
-                getSuperstructureInputs().wantGetAlgae &&
-                !Arm.getInstance().isArmStuck) {
-            alignMode = AlignMode.AlgaeAlign;
-        } else {
-            alignMode = AlignMode.None;
-        }
+    return new Superstructure.SuperstructureInputs(
+        /*
+         * PS5 L2 → Xbox Left Trigger (>0.5 threshold)
+         */
+        operatorController.getLeftTriggerAxis() > 0.5, // wantExtend
 
-        return new DriveInputs(
-                -operatorController.getHID().getLeftY(),
-                -operatorController.getHID().getLeftX(),
-                -operatorController.getHID().getRightX(),
-                0.1,
-                alignMode);
-    }
+        /*
+         * PS5 R2 → Xbox Right Trigger
+         */
+        operatorController.getRightTriggerAxis() > 0.5, // wantGroundIntake
 
-    // Auto-align conditions
-    public boolean wantCoralAutoAlign() {
-        return getSuperstructureInputs().wantExtend;
-    }
+        /*
+         * PS5 Cross (X) → Xbox A
+         */
+        operatorController.getAButton(), // wantArmSourceIntake
 
-    public boolean wantAlgaeAutoAlign() {
-        return getSuperstructureInputs().wantGetAlgae &&
-                Arm.getInstance().isAtSetpoint() &&
-                Elevator.getInstance().isAtSetpoint();
-    }
+        /*
+         * PS5 Square → Xbox X
+         */
+        operatorController.getXButton(), // wantSourceIntake
 
-    public boolean wantBargeAutoAlign() {
-        return getSuperstructureInputs().wantExtend &&
-                (Superstructure.getInstance().state == Superstructure.State.AlgaeRest ||
-                        Superstructure.getInstance().state == Superstructure.State.PreBarge ||
-                        Superstructure.getInstance().state == Superstructure.State.ScoreBarge);
-    }
+        /*
+         * Score: driver Right Bumper OR operator Right Stick Button
+         * PS5 R3 → Xbox Right Stick Button
+         */
+        driverController.getRightBumper()
+            || operatorController.getRightStickButton(), // wantScore
 
-    // Offset arm inputs
-    public boolean wantOffsetArmPositive() {
-        return operatorController.getHID().getLeftX() > 0.9 && operatorController.getHID().getL3Button();
-    }
+        level, // wantedScoringLevel
 
-    public boolean wantOffsetArmNegative() {
-        return operatorController.getHID().getLeftX() < -0.9 && operatorController.getHID().getL3Button();
-    }
+        /*
+         * PS5 R1 → Xbox Right Bumper
+         */
+        operatorController.getRightBumper(), // wantGetAlgae
 
-    // Superstructure inputs
-    public Superstructure.SuperstructureInputs getSuperstructureInputs() {
-        int pov = operatorController.getHID().getPOV();
-        Superstructure.ScoringLevel level;
+        /*
+         * PS5 Triangle → Xbox Y
+         */
+        operatorController.getYButton(), // wantDescoreAlgae
 
-        switch (pov) {
-            case 0:
-                level = Superstructure.ScoringLevel.L4;
-                break;
-            case 270:
-                level = Superstructure.ScoringLevel.L3;
-                break;
-            case 180:
-                level = Superstructure.ScoringLevel.L2;
-                break;
-            case 90:
-                level = Superstructure.ScoringLevel.TROUGH;
-                break;
-            default:
-                level = lastScoringLevel;
-        }
-        lastScoringLevel = level;
+        false, // wantVerticalPickup (PS5’de de kullanılmıyordu)
 
-        return new Superstructure.SuperstructureInputs(
-                operatorController.getHID().getL2Button(), // wantExtend
-                operatorController.getHID().getR2Button(), // wantGroundIntake
-                operatorController.getHID().getCrossButton(), // wantArmSourceIntake
-                operatorController.getHID().getSquareButton(), // wantSourceIntake
-                driverController.getRawAxis(4) > 0.5 || operatorController.getHID().getR3Button(), // wantScore
-                level, // wantedScoringLevel
-                operatorController.getHID().getR1Button(), // wantGetAlgae
-                operatorController.getHID().getTriangleButton(), // wantDescoreAlgae
-                false, // wantVerticalPickup
-                operatorController.getHID().getOptionsButton(), // wantResetSuperstructure
-                operatorController.getHID().getCircleButton(), // wantScoreProcessor
-                operatorController.getHID().getL1Button(), // wantAlgaeGroundIntake
-                false // wantPopsiclePickup
-        );
-    }
+        /*
+         * PS5 Options → Xbox Menu Button
+         */
+        operatorController.getStartButton(), // wantResetSuperstructure
+
+        /*
+         * PS5 Circle → Xbox B
+         */
+        operatorController.getBButton(), // wantScoreProcessor
+
+        /*
+         * PS5 L1 → Xbox Left Bumper
+         */
+        operatorController.getLeftBumper(), // wantAlgaeGroundIntake
+
+        false // wantPopsiclePickup
+    );
+  }
 }

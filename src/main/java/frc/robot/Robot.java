@@ -14,7 +14,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -47,7 +46,8 @@ public class Robot extends LoggedRobot {
 
   public boolean isRedAlliance() {
 
-    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+        == DriverStation.Alliance.Red;
   }
 
   public boolean isOnRedSide() {
@@ -76,12 +76,13 @@ public class Robot extends LoggedRobot {
     // Subsystems initialize
     Vision.getInstance();
 
-    drive = new Drive(
-        new GyroIOPigeon2(),
-        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-        new ModuleIOTalonFX(TunerConstants.FrontRight),
-        new ModuleIOTalonFX(TunerConstants.BackLeft),
-        new ModuleIOTalonFX(TunerConstants.BackRight));
+    drive =
+        new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
 
     // Auto Chooser
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

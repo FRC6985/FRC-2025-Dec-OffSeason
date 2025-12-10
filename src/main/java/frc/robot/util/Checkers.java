@@ -21,12 +21,13 @@ import frc.robot.generated.TunerConstants;
 
 public final class Checkers {
   public static void checkSwerveConfigures() {
-    var modules = new SwerveModuleConstants[] {
-        TunerConstants.FrontLeft,
-        TunerConstants.FrontRight,
-        TunerConstants.BackLeft,
-        TunerConstants.BackRight
-    };
+    var modules =
+        new SwerveModuleConstants[] {
+          TunerConstants.FrontLeft,
+          TunerConstants.FrontRight,
+          TunerConstants.BackLeft,
+          TunerConstants.BackRight
+        };
     for (var constants : modules) {
       if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
           || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {

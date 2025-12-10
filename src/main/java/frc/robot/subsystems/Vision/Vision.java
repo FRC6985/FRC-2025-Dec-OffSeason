@@ -1,35 +1,32 @@
 package frc.robot.subsystems.Vision;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.targeting.PhotonPipelineResult;
-
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.util.Checkers;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 public class Vision extends SubsystemBase {
 
   private static final Vision INSTANCE = new Vision();
 
-  private Vision() {
-  }
+  private Vision() {}
 
   public static Vision getInstance() {
     return INSTANCE;
   }
 
   private final Camera[] cameras = {
-      new Camera(Constants.Vision.FrontRightName, Constants.Vision.FRONT_RIGHT_TRANSFORM),
-      new Camera(Constants.Vision.FrontLeftName, Constants.Vision.FRONT_LEFT_TRANSFORM),
-      new Camera(Constants.Vision.BackRightName, Constants.Vision.BACK_RIGHT_TRANSFORM),
-      new Camera(Constants.Vision.BackLeftName, Constants.Vision.BACK_LEFT_TRANSFORM),
+    new Camera(Constants.Vision.FrontRightName, Constants.Vision.FRONT_RIGHT_TRANSFORM),
+    new Camera(Constants.Vision.FrontLeftName, Constants.Vision.FRONT_LEFT_TRANSFORM),
+    new Camera(Constants.Vision.BackRightName, Constants.Vision.BACK_RIGHT_TRANSFORM),
+    new Camera(Constants.Vision.BackLeftName, Constants.Vision.BACK_LEFT_TRANSFORM),
   };
 
   public final Camera[] getCameras() {
@@ -55,11 +52,13 @@ public class Vision extends SubsystemBase {
 
   public void periodicAddMeasurements(SwerveDrivePoseEstimator poseEstimator) {
     for (Camera camera : cameras) {
-      Stream<PhotonPipelineResult> results = camera.getAllUnreadResults().stream().filter(r -> removeResult(r));
-      List<EstimatedRobotPose> estimatedPoses = results
-          .map(r -> camera.poseEstimator.update(r).orElse(null))
-          .filter(Objects::nonNull)
-          .toList();
+      Stream<PhotonPipelineResult> results =
+          camera.getAllUnreadResults().stream().filter(r -> removeResult(r));
+      List<EstimatedRobotPose> estimatedPoses =
+          results
+              .map(r -> camera.poseEstimator.update(r).orElse(null))
+              .filter(Objects::nonNull)
+              .toList();
 
       for (EstimatedRobotPose pose : estimatedPoses) {
         if (Checkers.isInsideField(pose.estimatedPose.getTranslation().toTranslation2d())
@@ -79,8 +78,7 @@ public class Vision extends SubsystemBase {
     // Send camera status to databoard
     for (Camera camera : getCameras()) {
       builder.addBooleanProperty(
-          camera.getName() + " connection status", () -> camera.isConnected(), (v) -> {
-          });
+          camera.getName() + " connection status", () -> camera.isConnected(), (v) -> {});
     }
   }
 }
