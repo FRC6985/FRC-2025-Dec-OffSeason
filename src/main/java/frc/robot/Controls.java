@@ -39,7 +39,8 @@ public class Controls {
     public final double deadzone;
     public final AlignMode alignMode;
 
-    public DriveInputs(double forward, double left, double rotation, double deadzone, AlignMode alignMode) {
+    public DriveInputs(
+        double forward, double left, double rotation, double deadzone, AlignMode alignMode) {
       this.forward = forward;
       this.left = left;
       this.rotation = rotation;
@@ -59,7 +60,8 @@ public class Controls {
   }
 
   // Empty inputs constant
-  public static final DriveInputs EMPTY_INPUTS = new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
+  public static final DriveInputs EMPTY_INPUTS =
+      new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
 
   // Constructor
   private Controls() {
@@ -141,13 +143,11 @@ public class Controls {
 
   // Offset arm inputs
   public boolean wantOffsetArmPositive() {
-    return operatorController.getRawAxis(0) > 0.9
-        && operatorController.getLeftStickButton();
+    return operatorController.getRawAxis(0) > 0.9 && operatorController.getLeftStickButton();
   }
 
   public boolean wantOffsetArmNegative() {
-    return operatorController.getRawAxis(0) < -0.9
-        && operatorController.getLeftStickButton();
+    return operatorController.getRawAxis(0) < -0.9 && operatorController.getLeftStickButton();
   }
 
   // Superstructure inputs (PS5 tuşları → Xbox eşleştirmeleri yorumlandı)
@@ -198,9 +198,7 @@ public class Controls {
          * Score: driver Right Bumper OR operator Right Stick Button
          * PS5 R3 → Xbox Right Stick Button
          */
-        driverController.getRightBumper()
-            || operatorController.getRightStickButton(), // wantScore
-
+        driverController.getRightBumper() || operatorController.getRightStickButton(), // wantScore
         level, // wantedScoringLevel
 
         /*
@@ -212,7 +210,6 @@ public class Controls {
          * PS5 Triangle → Xbox Y
          */
         operatorController.getYButton(), // wantDescoreAlgae
-
         false, // wantVerticalPickup (PS5’de de kullanılmıyordu)
 
         /*
@@ -229,8 +226,7 @@ public class Controls {
          * PS5 L1 → Xbox Left Bumper
          */
         operatorController.getLeftBumper(), // wantAlgaeGroundIntake
-
         false // wantPopsiclePickup
-    );
+        );
   }
 }

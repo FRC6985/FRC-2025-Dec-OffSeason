@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.Superstructure;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,11 @@ public class PoseScoringTracker {
    * Finds the closest coral/reef scoring pose that hasn't been used yet. Considers "badness" factor
    * for already scored positions.
    */
+  public static boolean withinTolerance(Translation2d t) {
+    return Robot.getInstance().getEstimatedPose().getTranslation().getDistance(t)
+        < Constants.Extra.ALIGNMENT_TOLERANCE;
+  }
+
   public static IndexedValue<Pose2d> getClosestFudgedScoringPose(Pose2d estimatedPose) {
     List<Pose2d> poses =
         Robot.getInstance().isOnRedSide()
@@ -101,6 +107,62 @@ public class PoseScoringTracker {
     }
 
     return new IndexedValue<>(result.getKey(), result.getValue());
+  }
+
+  public static Pose2d getClosestAlgaeGrabPose() {
+    List<Pose2d> poses =
+        Robot.getInstance().isRedAlliance()
+            ? Constants.Field.redAlgaeGrabbingPose
+            : Constants.Field.blueAlgaeGrabbingPose;
+
+    // Filtreleme
+    List<Pose2d> filtered =
+        poses.stream()
+            .filter(
+                p ->
+                    p.getTranslation()
+                            .getDistance(Robot.getInstance().getEstimatedPose().getTranslation())
+                        < Constants.Extra.MAX_NODE_DISTANCE)
+            .toList();
+
+    // Boş ise null döndür
+    if (filtered.isEmpty()) return null;
+
+    // En düşük score'a sahip olanı seç
+
+    return filtered.stream()
+        .min(
+            (p1, p2) ->
+                Double.compare(
+                    score(p1, Robot.getInstance().getEstimatedPose()),
+                    score(p2, Robot.getInstance().getEstimatedPose())))
+        .orElse(null);
+  }
+
+  public static Pose2d getClosestTroughScoringPose() {
+    List<Pose2d> poses =
+        Robot.getInstance().isRedAlliance()
+            ? Constants.Field.redTroughScoringPoses
+            : Constants.Field.blueTroughScoringPoses;
+
+    List<Pose2d> filtered =
+        poses.stream()
+            .filter(
+                p ->
+                    p.getTranslation()
+                            .getDistance(Robot.getInstance().getEstimatedPose().getTranslation())
+                        < Constants.Extra.MAX_NODE_DISTANCE)
+            .toList();
+
+    if (filtered.isEmpty()) return null;
+
+    return filtered.stream()
+        .min(
+            (p1, p2) ->
+                Double.compare(
+                    score(p1, Robot.getInstance().getEstimatedPose()),
+                    score(p2, Robot.getInstance().getEstimatedPose())))
+        .orElse(null);
   }
 
   private static final double BARGE_SCORING_POSITION_TOLERANCE = 0.1;

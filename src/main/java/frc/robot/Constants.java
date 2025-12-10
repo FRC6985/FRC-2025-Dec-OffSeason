@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -51,6 +52,23 @@ public final class Constants {
     public static double DRIVE_RATIO = 1.0 / ((16.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0));
     public static double TURN_RATIO = 150.0 / 7.0;
     public static int INTAKE_LINEBREAK = 0;
+    public static double ALIGNMENT_TOLERANCE = 0.04;
+    public static double STARTING_TOLERANCE = 0.15;
+
+    public static PIDController makeAlignTurnPID() {
+      PIDController pidC = new PIDController(6.0, 0.0, 0.04);
+      pidC.enableContinuousInput(-Math.PI, Math.PI);
+      return pidC;
+    }
+
+    public static PIDController makeAlignDrivePID() {
+      return new PIDController(5.0, 0.0, 0.01);
+    }
+
+    public static PIDController makeBargeAlignDrivePID() {
+      return new PIDController(6.0, 0.0, 0.0);
+    }
+
     public static double maxAlignTranslationSpeed = 1.5;
     public static double maxAlignRotationSpeed = 2.5;
     public static double maxBargeAlignTranslationSpeed = 1.5;

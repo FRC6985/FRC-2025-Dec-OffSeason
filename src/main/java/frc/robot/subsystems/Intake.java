@@ -100,7 +100,8 @@ public class Intake extends SubsystemBase {
     realPivotState = p;
 
     if (hasCoral() && r == RollerState.Off) {
-      if (Controls.getInstance().getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
+      if (Controls.getInstance().getSuperstructureInputs().wantedScoringLevel
+          != Superstructure.ScoringLevel.TROUGH) {
         realRollerState = RollerState.In;
       } else {
         realRollerState = RollerState.SlowIn;
@@ -122,12 +123,12 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean hasCoral() {
-    return !linebreak.get()
-        || Controls.getInstance().operatorController.getStartButton();
+    return !linebreak.get() || Controls.getInstance().operatorController.getStartButton();
   }
 
   public boolean isAtSetpoint() {
-    return Math.abs(getAngle() - getEffectivePivotState().angleSetpoint) < Constants.Intake.SETPOINT_THRESHOLD;
+    return Math.abs(getAngle() - getEffectivePivotState().angleSetpoint)
+        < Constants.Intake.SETPOINT_THRESHOLD;
   }
 
   public PivotState getEffectivePivotState() {
@@ -158,7 +159,8 @@ public class Intake extends SubsystemBase {
 
   private boolean isUnsafeToGoUp() {
     double armPosition = Math.abs(MathUtil.angleModulus(Arm.getInstance().getPosition()));
-    double elevatorToArmLimit = Math.PI - Arm.getInstance().getElevatorToArm().get(Elevator.getInstance().getHeight());
+    double elevatorToArmLimit =
+        Math.PI - Arm.getInstance().getElevatorToArm().get(Elevator.getInstance().getHeight());
     return armPosition < elevatorToArmLimit;
   }
 

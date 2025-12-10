@@ -59,6 +59,15 @@ public class Robot extends LoggedRobot {
   }
 
   private int tickNumber = 0;
+  private boolean isAligned = false;
+
+  public void setIsAligned(boolean aligned) {
+    isAligned = aligned;
+  }
+
+  public boolean getIsAligned() {
+    return isAligned;
+  }
 
   public int getTickNumber() {
     return tickNumber;
