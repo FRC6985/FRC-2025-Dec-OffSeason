@@ -24,9 +24,6 @@ public class Controls {
   // Controllers
   public final XboxController driverController;
   public final XboxController operatorController;
-  /*
-   * PS5 Controller yerine artık ikinci XboxController kullanıyoruz.
-   */
 
   // State
   public Superstructure.ScoringLevel lastScoringLevel = Superstructure.ScoringLevel.TROUGH;
@@ -60,14 +57,44 @@ public class Controls {
   }
 
   // Empty inputs constant
-  public static final DriveInputs EMPTY_INPUTS =
-      new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
+  public static final DriveInputs EMPTY_INPUTS = new DriveInputs(0.0, 0.0, 0.0, 0.0, AlignMode.None);
 
   // Constructor
   private Controls() {
     driverController = new XboxController(0);
-    operatorController = new XboxController(1); // PS5 yerine 2. Xbox
+    operatorController = new XboxController(1);
   }
+
+  // ==================== XBOX CONTROLLER MAPPING ====================
+  /*
+   * SÜRÜCÜ KONTROLCÜSÜ (Port 0):
+   * - Sol Analog Y → İleri/Geri hareket
+   * - Sol Analog X → Sağa/Sola hareket
+   * - Sağ Analog X → Dönüş
+   * - Sağ Bumper (RB) → Skor (yedek)
+   *
+   * OPERATÖR KONTROLCÜSÜ (Port 1):
+   * - Sol Analog Y → İleri/Geri hareket
+   * - Sol Analog X → Sağa/Sola hareket
+   * - Sağ Analog X → Dönüş
+   * - Sol Analog Basma + Sol Analog X > 0.9 → Kol pozisyonu artır
+   * - Sol Analog Basma + Sol Analog X < -0.9 → Kol pozisyonu azalt
+   * - D-Pad Yukarı (0°) → Seviye 4
+   * - D-Pad Sol (270°) → Seviye 3
+   * - D-Pad Aşağı (180°) → Seviye 2
+   * - D-Pad Sağ (90°) → Oluk (Trough)
+   * - Sol Tetik (LT) > 0.5 → Uzatma (wantExtend)
+   * - Sağ Tetik (RT) > 0.5 → Yerden alma (wantGroundIntake)
+   * - Sol Bumper (LB) → Yerden yosun alma (wantAlgaeGroundIntake)
+   * - Sağ Bumper (RB) → Yosun al (wantGetAlgae)
+   * - Sağ Analog Basma → Skor (wantScore)
+   * - A Tuşu → Kaynak kol alma (wantArmSourceIntake)
+   * - B Tuşu → İşlemci skoru (wantScoreProcessor)
+   * - X Tuşu → Kaynak alma (wantSourceIntake)
+   * - Y Tuşu → Yosun çıkar (wantDescoreAlgae)
+   * - Start Tuşu → Üst yapıyı sıfırla (wantResetSuperstructure)
+   */
+  // ================================================================
 
   // Driver inputs
   public DriveInputs getDriverInputs() {
@@ -82,21 +109,21 @@ public class Controls {
       alignMode = AlignMode.TroughAlign;
     } else if (wantAlgaeAutoAlign()
         && getSuperstructureInputs().wantGetAlgae
-        && !Arm.getInstance().isArmStuck) {
+        && !Arm.getInstance().hasObject) {
       alignMode = AlignMode.AlgaeAlign;
     } else {
       alignMode = AlignMode.None;
     }
 
     return new DriveInputs(
-        driverController.getRawAxis(1), // left stick Y
-        -driverController.getRawAxis(0), // left stick X
-        -driverController.getRawAxis(4), // right stick X (turn)
+        driverController.getRawAxis(1), // Sol Analog Y → İleri/Geri
+        -driverController.getRawAxis(0), // Sol Analog X → Sağa/Sola
+        -driverController.getRawAxis(4), // Sağ Analog X → Dönüş
         0.05,
         alignMode);
   }
 
-  // Operator inputs — Xbox eşleştirme açıklamaları eklendi
+  // Operator inputs
   public DriveInputs getOperatorInputs() {
     AlignMode alignMode;
     if (wantBargeAutoAlign()) {
@@ -109,16 +136,16 @@ public class Controls {
       alignMode = AlignMode.TroughAlign;
     } else if (wantAlgaeAutoAlign()
         && getSuperstructureInputs().wantGetAlgae
-        && !Arm.getInstance().isArmStuck) {
+        && !Arm.getInstance().hasObject) {
       alignMode = AlignMode.AlgaeAlign;
     } else {
       alignMode = AlignMode.None;
     }
 
     return new DriveInputs(
-        -operatorController.getRawAxis(1), // left stick Y
-        -operatorController.getRawAxis(0), // left stick X
-        -operatorController.getRawAxis(4), // right stick X
+        -operatorController.getRawAxis(1), // Sol Analog Y → İleri/Geri
+        -operatorController.getRawAxis(0), // Sol Analog X → Sağa/Sola
+        -operatorController.getRawAxis(4), // Sağ Analog X → Dönüş
         0.1,
         alignMode);
   }
@@ -150,23 +177,23 @@ public class Controls {
     return operatorController.getRawAxis(0) < -0.9 && operatorController.getLeftStickButton();
   }
 
-  // Superstructure inputs (PS5 tuşları → Xbox eşleştirmeleri yorumlandı)
+  // Superstructure inputs
   public Superstructure.SuperstructureInputs getSuperstructureInputs() {
     int pov = operatorController.getPOV();
     Superstructure.ScoringLevel level;
 
     switch (pov) {
       case 0:
-        level = Superstructure.ScoringLevel.L4;
+        level = Superstructure.ScoringLevel.L4; // D-Pad Yukarı
         break;
       case 270:
-        level = Superstructure.ScoringLevel.L3;
+        level = Superstructure.ScoringLevel.L3; // D-Pad Sol
         break;
       case 180:
-        level = Superstructure.ScoringLevel.L2;
+        level = Superstructure.ScoringLevel.L2; // D-Pad Aşağı
         break;
       case 90:
-        level = Superstructure.ScoringLevel.TROUGH;
+        level = Superstructure.ScoringLevel.TROUGH; // D-Pad Sağ
         break;
       default:
         level = lastScoringLevel;
@@ -174,59 +201,30 @@ public class Controls {
     lastScoringLevel = level;
 
     return new Superstructure.SuperstructureInputs(
-        /*
-         * PS5 L2 → Xbox Left Trigger (>0.5 threshold)
-         */
-        operatorController.getLeftTriggerAxis() > 0.5, // wantExtend
+        operatorController.getLeftTriggerAxis() > 0.5, // Sol Tetik → Uzatma (wantExtend)
 
-        /*
-         * PS5 R2 → Xbox Right Trigger
-         */
-        operatorController.getRightTriggerAxis() > 0.5, // wantGroundIntake
+        operatorController.getRightTriggerAxis() > 0.5, // Sağ Tetik → Yerden alma (wantGroundIntake)
 
-        /*
-         * PS5 Cross (X) → Xbox A
-         */
-        operatorController.getAButton(), // wantArmSourceIntake
+        operatorController.getAButton(), // A Tuşu → Kaynak kol alma (wantArmSourceIntake)
 
-        /*
-         * PS5 Square → Xbox X
-         */
-        operatorController.getXButton(), // wantSourceIntake
+        operatorController.getXButton(), // X Tuşu → Kaynak alma (wantSourceIntake)
 
-        /*
-         * Score: driver Right Bumper OR operator Right Stick Button
-         * PS5 R3 → Xbox Right Stick Button
-         */
-        driverController.getRightBumper() || operatorController.getRightStickButton(), // wantScore
-        level, // wantedScoringLevel
+        driverController.getRightBumperButton() || operatorController.getRightStickButton(), // Sürücü Sağ Bumper veya
+                                                                                             // Operatör Sağ Analog
+                                                                                             // Basma → Skor (wantScore)
+        level, // D-Pad ile seçilen seviye (wantedScoringLevel)
 
-        /*
-         * PS5 R1 → Xbox Right Bumper
-         */
-        operatorController.getRightBumper(), // wantGetAlgae
+        operatorController.getRightBumperButton(), // Sağ Bumper → Yosun al (wantGetAlgae)
 
-        /*
-         * PS5 Triangle → Xbox Y
-         */
-        operatorController.getYButton(), // wantDescoreAlgae
-        false, // wantVerticalPickup (PS5’de de kullanılmıyordu)
+        operatorController.getYButton(), // Y Tuşu → Yosun çıkar (wantDescoreAlgae)
+        false, // wantVerticalPickup
 
-        /*
-         * PS5 Options → Xbox Menu Button
-         */
-        operatorController.getStartButton(), // wantResetSuperstructure
+        operatorController.getStartButton(), // Start Tuşu → Üst yapıyı sıfırla (wantResetSuperstructure)
 
-        /*
-         * PS5 Circle → Xbox B
-         */
-        operatorController.getBButton(), // wantScoreProcessor
+        operatorController.getBButton(), // B Tuşu → İşlemci skoru (wantScoreProcessor)
 
-        /*
-         * PS5 L1 → Xbox Left Bumper
-         */
-        operatorController.getLeftBumper(), // wantAlgaeGroundIntake
+        operatorController.getLeftBumperButton(), // Sol Bumper → Yerden yosun alma (wantAlgaeGroundIntake)
         false // wantPopsiclePickup
-        );
+    );
   }
 }

@@ -15,7 +15,6 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,7 +54,8 @@ public class Robot extends LoggedRobot {
 
   public boolean isRedAlliance() {
 
-    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+    return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+        == DriverStation.Alliance.Red;
   }
 
   public boolean isOnRedSide() {
@@ -97,120 +97,155 @@ public class Robot extends LoggedRobot {
     Elevator.getInstance();
     Superstructure.getInstance();
 
-    drive = new Drive(
-        new GyroIOPigeon2(),
-        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-        new ModuleIOTalonFX(TunerConstants.FrontRight),
-        new ModuleIOTalonFX(TunerConstants.BackLeft),
-        new ModuleIOTalonFX(TunerConstants.BackRight));
+    drive =
+        new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
 
-    NamedCommands.registerCommand("intakeDown",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantGroundIntake = true;
-        }));
+    NamedCommands.registerCommand(
+        "intakeDown",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantGroundIntake = true;
+            }));
 
-    NamedCommands.registerCommand("intakeUp",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantGroundIntake = false;
-        }));
+    NamedCommands.registerCommand(
+        "intakeUp",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantGroundIntake = false;
+            }));
 
     // Wait for coral
-    NamedCommands.registerCommand("waitForCoral",
-        Commands.waitUntil(() -> Intake.getInstance().hasCoral()));
+    NamedCommands.registerCommand(
+        "waitForCoral", Commands.waitUntil(() -> Intake.getInstance().hasCoral()));
 
     // L4 Scoring
-    NamedCommands.registerCommand("prepareL4",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantExtend = true;
-          Superstructure.getInstance().inputs.wantedScoringLevel = Superstructure.ScoringLevel.L4;
-        }));
+    NamedCommands.registerCommand(
+        "prepareL4",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantExtend = true;
+              Superstructure.getInstance().inputs.wantedScoringLevel =
+                  Superstructure.ScoringLevel.L4;
+            }));
 
-    NamedCommands.registerCommand("scoreL4",
+    NamedCommands.registerCommand(
+        "scoreL4",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantScore = true;
-            }),
-            Commands.waitUntil(() -> Superstructure.getInstance().state == Superstructure.State.PlaceL4
-                && Arm.getInstance().isAtSetpoint()
-                && Elevator.getInstance().isAtSetpoint()),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantScore = true;
+                }),
+            Commands.waitUntil(
+                () ->
+                    Superstructure.getInstance().state == Superstructure.State.PlaceL4
+                        && Arm.getInstance().isAtSetpoint()
+                        && Elevator.getInstance().isAtSetpoint()),
             Commands.waitSeconds(0.3), // Piece release
             Commands.waitUntil(() -> !Arm.getInstance().hasObject)));
 
     // L3 Scoring
-    NamedCommands.registerCommand("prepareL3",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantExtend = true;
-          Superstructure.getInstance().inputs.wantedScoringLevel = Superstructure.ScoringLevel.L3;
-        }));
+    NamedCommands.registerCommand(
+        "prepareL3",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantExtend = true;
+              Superstructure.getInstance().inputs.wantedScoringLevel =
+                  Superstructure.ScoringLevel.L3;
+            }));
 
-    NamedCommands.registerCommand("scoreL3",
+    NamedCommands.registerCommand(
+        "scoreL3",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantScore = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantScore = true;
+                }),
             Commands.waitUntil(() -> !Arm.getInstance().hasObject)));
 
     // L2 Scoring
-    NamedCommands.registerCommand("prepareL2",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantExtend = true;
-          Superstructure.getInstance().inputs.wantedScoringLevel = Superstructure.ScoringLevel.L2;
-        }));
+    NamedCommands.registerCommand(
+        "prepareL2",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantExtend = true;
+              Superstructure.getInstance().inputs.wantedScoringLevel =
+                  Superstructure.ScoringLevel.L2;
+            }));
 
-    NamedCommands.registerCommand("scoreL2",
+    NamedCommands.registerCommand(
+        "scoreL2",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantScore = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantScore = true;
+                }),
             Commands.waitUntil(() -> !Arm.getInstance().hasObject)));
 
     // Trough
-    NamedCommands.registerCommand("scoreTrough",
+    NamedCommands.registerCommand(
+        "scoreTrough",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantExtend = true;
-              Superstructure.getInstance().inputs.wantedScoringLevel = Superstructure.ScoringLevel.TROUGH;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantExtend = true;
+                  Superstructure.getInstance().inputs.wantedScoringLevel =
+                      Superstructure.ScoringLevel.TROUGH;
+                }),
             Commands.waitUntil(() -> Intake.getInstance().isAtSetpoint()),
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantScore = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantScore = true;
+                }),
             Commands.waitSeconds(0.5)));
 
     // Algae
-    NamedCommands.registerCommand("startGetAlgae",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().inputs.wantGetAlgae = true;
-        }));
+    NamedCommands.registerCommand(
+        "startGetAlgae",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().inputs.wantGetAlgae = true;
+            }));
 
-    NamedCommands.registerCommand("waitForAlgae",
-        Commands.waitUntil(() -> Arm.getInstance().hasObject));
+    NamedCommands.registerCommand(
+        "waitForAlgae", Commands.waitUntil(() -> Arm.getInstance().hasObject));
 
-    NamedCommands.registerCommand("scoreAlgae",
+    NamedCommands.registerCommand(
+        "scoreAlgae",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantExtend = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantExtend = true;
+                }),
             Commands.waitSeconds(0.3),
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantScore = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantScore = true;
+                }),
             Commands.waitSeconds(0.5)));
 
     // Popsicle (vertical coral)
-    NamedCommands.registerCommand("popsiclePickup",
+    NamedCommands.registerCommand(
+        "popsiclePickup",
         Commands.sequence(
-            Commands.runOnce(() -> {
-              Superstructure.getInstance().inputs.wantPopsiclePickup = true;
-            }),
+            Commands.runOnce(
+                () -> {
+                  Superstructure.getInstance().inputs.wantPopsiclePickup = true;
+                }),
             Commands.waitSeconds(Superstructure.POPSICLE_DELAY),
             Commands.waitUntil(() -> Arm.getInstance().hasObject)));
 
     // Reset
-    NamedCommands.registerCommand("resetInputs",
-        Commands.runOnce(() -> {
-          Superstructure.getInstance().emptyInputs();
-        }));
+    NamedCommands.registerCommand(
+        "resetInputs",
+        Commands.runOnce(
+            () -> {
+              Superstructure.getInstance().emptyInputs();
+            }));
 
     // Auto Chooser
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -243,15 +278,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    drive.setDefaultCommand(
-        new TeleopDriveCommand(() -> Controls.getInstance().getDriverInputs()));
+    drive.setDefaultCommand(new TeleopDriveCommand(() -> Controls.getInstance().getDriverInputs()));
 
-    Superstructure.getInstance().setDefaultCommand(
-        new TeleopSuperstructureCommand());
+    Superstructure.getInstance().setDefaultCommand(new TeleopSuperstructureCommand());
 
-    if (!Arm.getInstance().isZeroed ||
-        !Elevator.getInstance().isZeroed() ||
-        !Intake.getInstance().isZeroed) {
+    if (!Arm.getInstance().isZeroed
+        || !Elevator.getInstance().isZeroed()
+        || !Intake.getInstance().isZeroed) {
       Superstructure.getInstance().makeZeroAllSubsystemsCommand().schedule();
     }
   }
