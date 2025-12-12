@@ -130,7 +130,7 @@ public class TeleopDriveCommand extends Command {
       }
     }
 
-    // Robot.getInstance().drive.driveFieldRelative(speeds);
+    Robot.getInstance().drive.driveFieldRelative(speeds);
   }
 
   // -------------------- Helper functions --------------------

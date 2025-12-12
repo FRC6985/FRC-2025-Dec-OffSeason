@@ -258,6 +258,20 @@ public class Drive extends SubsystemBase {
     runVelocity(new ChassisSpeeds());
   }
 
+  public void driveFieldRelative(ChassisSpeeds speeds) {
+    driveRobotRelative(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()));
+  }
+
+  /**
+   * Runs the drive at the desired robot-relative velocity. This is essentially an alias for
+   * runVelocity() for compatibility.
+   *
+   * @param speeds Robot-relative speeds in meters/sec
+   */
+  public void driveRobotRelative(ChassisSpeeds speeds) {
+    runVelocity(speeds);
+  }
+
   /**
    * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
    * return to their normal orientations the next time a nonzero velocity is requested.
