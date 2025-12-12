@@ -116,9 +116,9 @@ public class Controls {
     }
 
     return new DriveInputs(
-        driverController.getRawAxis(1), // Sol Analog Y → İleri/Geri
-        -driverController.getRawAxis(0), // Sol Analog X → Sağa/Sola
-        -driverController.getRawAxis(4), // Sağ Analog X → Dönüş
+        driverController.getLeftY(), // Sol Analog Y → İleri/Geri
+        -driverController.getLeftX(), // Sol Analog X → Sağa/Sola
+        -driverController.getRightX(), // Sağ Analog X → Dönüş
         0.05,
         alignMode);
   }
@@ -143,9 +143,9 @@ public class Controls {
     }
 
     return new DriveInputs(
-        -operatorController.getRawAxis(1), // Sol Analog Y → İleri/Geri
-        -operatorController.getRawAxis(0), // Sol Analog X → Sağa/Sola
-        -operatorController.getRawAxis(4), // Sağ Analog X → Dönüş
+        -operatorController.getLeftY(), // Sol Analog Y → İleri/Geri
+        -operatorController.getLeftX(), // Sol Analog X → Sağa/Sola
+        -operatorController.getRightX(), // Sağ Analog X → Dönüş
         0.1,
         alignMode);
   }
@@ -170,11 +170,11 @@ public class Controls {
 
   // Offset arm inputs
   public boolean wantOffsetArmPositive() {
-    return operatorController.getRawAxis(0) > 0.9 && operatorController.getLeftStickButton();
+    return operatorController.getLeftX() > 0.9 && operatorController.getLeftStickButton();
   }
 
   public boolean wantOffsetArmNegative() {
-    return operatorController.getRawAxis(0) < -0.9 && operatorController.getLeftStickButton();
+    return operatorController.getLeftX() < -0.9 && operatorController.getLeftStickButton();
   }
 
   // Superstructure inputs

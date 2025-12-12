@@ -64,15 +64,15 @@ public class Intake extends SubsystemBase {
 
   // Constructor
   private Intake() {
-    pivotMotor = new TalonFX(Constants.CanIds.INTAKE_PIVOT_MOTOR);
+    pivotMotor = new TalonFX(Constants.CanIds.INTAKE_PIVOT_MOTOR, "canivore");
     pivotMotor.getConfigurator().apply(Constants.Intake.PIVOT_CONFIG);
 
-    rollerMotor = new TalonFX(Constants.CanIds.INTAKE_ROLLER_MOTOR);
+    rollerMotor = new TalonFX(Constants.CanIds.INTAKE_ROLLER_MOTOR, "canivore");
     rollerMotor
         .getConfigurator()
         .apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
 
-    centeringMotor = new TalonFX(Constants.CanIds.INTAKE_CENTERING_MOTOR);
+    centeringMotor = new TalonFX(Constants.CanIds.INTAKE_CENTERING_MOTOR, "canivore");
     centeringMotor
         .getConfigurator()
         .apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
@@ -100,8 +100,7 @@ public class Intake extends SubsystemBase {
     realPivotState = p;
 
     if (hasCoral() && r == RollerState.Off) {
-      if (Controls.getInstance().getSuperstructureInputs().wantedScoringLevel
-          != Superstructure.ScoringLevel.TROUGH) {
+      if (Controls.getInstance().getSuperstructureInputs().wantedScoringLevel != Superstructure.ScoringLevel.TROUGH) {
         realRollerState = RollerState.In;
       } else {
         realRollerState = RollerState.SlowIn;
@@ -127,8 +126,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean isAtSetpoint() {
-    return Math.abs(getAngle() - getEffectivePivotState().angleSetpoint)
-        < Constants.Intake.SETPOINT_THRESHOLD;
+    return Math.abs(getAngle() - getEffectivePivotState().angleSetpoint) < Constants.Intake.SETPOINT_THRESHOLD;
   }
 
   public PivotState getEffectivePivotState() {
@@ -159,8 +157,7 @@ public class Intake extends SubsystemBase {
 
   private boolean isUnsafeToGoUp() {
     double armPosition = Math.abs(MathUtil.angleModulus(Arm.getInstance().getPosition()));
-    double elevatorToArmLimit =
-        Math.PI - Arm.getInstance().getElevatorToArm().get(Elevator.getInstance().getHeight());
+    double elevatorToArmLimit = Math.PI - Arm.getInstance().getElevatorToArm().get(Elevator.getInstance().getHeight());
     return armPosition < elevatorToArmLimit;
   }
 

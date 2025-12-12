@@ -164,10 +164,10 @@ public class Arm extends SubsystemBase {
   // Constructor
   private Arm() {
     absoluteEncoder = new DutyCycleEncoder(Constants.DioIds.ARM_ENCODER);
-    armPivotMotor = new TalonFX(Constants.CanIds.ARM_PIVOT_MOTOR);
+    armPivotMotor = new TalonFX(Constants.CanIds.ARM_PIVOT_MOTOR, "canivore");
     armPivotMotor.getConfigurator().apply(Constants.Arm.PIVOT_CONFIG);
 
-    rollerMotor = new TalonFX(Constants.CanIds.ARM_ROLLER_MOTOR);
+    rollerMotor = new TalonFX(Constants.CanIds.ARM_ROLLER_MOTOR, "canivore");
     rollerMotor.getConfigurator().apply(new CurrentLimitsConfigs().withStatorCurrentLimit(80.0));
 
     statorCurrentSignal = rollerMotor.getStatorCurrent();
@@ -191,12 +191,11 @@ public class Arm extends SubsystemBase {
 
   // Getters for Side
   public Side getSideCloserToReef() {
-    Rotation2d directionTowardReefCenter =
-        Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER)
-            .minus(Robot.getInstance().getEstimatedPose().getTranslation())
-            .getAngle();
-    Rotation2d directionTowardRight =
-        Robot.getInstance().getEstimatedPose().getRotation().rotateBy(Rotation2d.kCW_90deg);
+    Rotation2d directionTowardReefCenter = Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER)
+        .minus(Robot.getInstance().getEstimatedPose().getTranslation())
+        .getAngle();
+    Rotation2d directionTowardRight = Robot.getInstance().getEstimatedPose().getRotation()
+        .rotateBy(Rotation2d.kCW_90deg);
 
     double ang = angleBetween(directionTowardReefCenter, directionTowardRight);
 
@@ -243,18 +242,17 @@ public class Arm extends SubsystemBase {
   // Distance check methods
   public boolean atSafeReefDistance() {
     return Robot.getInstance()
-            .getEstimatedPose()
-            .getTranslation()
-            .getDistance(Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER))
-        > Constants.Arm.SAFE_DISTANCE_FROM_REEF_CENTER;
+        .getEstimatedPose()
+        .getTranslation()
+        .getDistance(
+            Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER)) > Constants.Arm.SAFE_DISTANCE_FROM_REEF_CENTER;
   }
 
   public boolean atSafePlacementDistance() {
     return Robot.getInstance()
-            .getEstimatedPose()
-            .getTranslation()
-            .getDistance(Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER))
-        > Constants.Arm.SAFE_PLACEMENT_DISTANCE;
+        .getEstimatedPose()
+        .getTranslation()
+        .getDistance(Utils.mirrorIfRed(Constants.Field.BLUE_REEF_CENTER)) > Constants.Arm.SAFE_PLACEMENT_DISTANCE;
   }
 
   public boolean atSafeBargeDistance() {
@@ -295,13 +293,11 @@ public class Arm extends SubsystemBase {
     } else if (respectReef) {
       switch (closeSide) {
         case Neither:
-          p =
-              positions.stream()
-                  .min(
-                      (a, b) ->
-                          Double.compare(
-                              Math.abs(a - actualArmPosition), Math.abs(b - actualArmPosition)))
-                  .orElse(positions.get(0));
+          p = positions.stream()
+              .min(
+                  (a, b) -> Double.compare(
+                      Math.abs(a - actualArmPosition), Math.abs(b - actualArmPosition)))
+              .orElse(positions.get(0));
           break;
         case Right:
           p = actualArmPosition < Math.PI / 2 ? positions.get(1) : positions.get(0);
@@ -313,13 +309,11 @@ public class Arm extends SubsystemBase {
           p = positions.get(0);
       }
     } else {
-      p =
-          positions.stream()
-              .min(
-                  (a, b) ->
-                      Double.compare(
-                          Math.abs(a - actualArmPosition), Math.abs(b - actualArmPosition)))
-              .orElse(positions.get(0));
+      p = positions.stream()
+          .min(
+              (a, b) -> Double.compare(
+                  Math.abs(a - actualArmPosition), Math.abs(b - actualArmPosition)))
+          .orElse(positions.get(0));
     }
 
     // Keep arm inside robot
@@ -342,9 +336,8 @@ public class Arm extends SubsystemBase {
 
     // Clamping
     double actualElevatorHeight = Elevator.getInstance().getHeight();
-    double limit =
-        (Intake.getInstance().getEffectivePivotState() == Intake.PivotState.Down
-                && Intake.getInstance().isAtSetpoint())
+    double limit = (Intake.getInstance().getEffectivePivotState() == Intake.PivotState.Down
+        && Intake.getInstance().isAtSetpoint())
             ? elevatorToArmWhenIntakeDown.get(actualElevatorHeight)
             : elevatorToArm.get(actualElevatorHeight);
 
@@ -363,9 +356,8 @@ public class Arm extends SubsystemBase {
     }
 
     long startTime = System.nanoTime();
-    double answer =
-        positionFromAngle(
-            pivotState.getDesiredAngle(), pivotState.mirrorType != MirrorType.ActuallyFixedAngle);
+    double answer = positionFromAngle(
+        pivotState.getDesiredAngle(), pivotState.mirrorType != MirrorType.ActuallyFixedAngle);
     long milliseconds = (System.nanoTime() - startTime) / 1_000_000;
 
     lastUpdatedTick = Robot.getInstance().getTickNumber();
@@ -405,8 +397,10 @@ public class Arm extends SubsystemBase {
   private double closeClampedPosition() {
     double rawPosition = absoluteEncoder.get(); // 0.0 to 1.0
     double x = rawPosition - Constants.Arm.PIVOT_ABS_ENCODER_OFFSET_ENCODER_ROTATIONS;
-    while (x < -0.5) x += 1.0;
-    while (x > 0.5) x -= 1.0;
+    while (x < -0.5)
+      x += 1.0;
+    while (x > 0.5)
+      x -= 1.0;
 
     double rawReadingArmRotations = x * Constants.Arm.PIVOT_ENCODER_RATIO;
     double allowedOffsetArmRotations = 12.0 / 360.0;
@@ -434,10 +428,9 @@ public class Arm extends SubsystemBase {
   }
 
   public boolean getUndebouncedHasObject() {
-    double threshold =
-        (rollerState == RollerState.Idle || rollerState == RollerState.SlowIdle)
-            ? Constants.Arm.IDLE_CURRENT_DRAW
-            : Constants.Arm.CURRENT_DRAW;
+    double threshold = (rollerState == RollerState.Idle || rollerState == RollerState.SlowIdle)
+        ? Constants.Arm.IDLE_CURRENT_DRAW
+        : Constants.Arm.CURRENT_DRAW;
     return statorCurrentSignal.getValueAsDouble() > threshold;
   }
 
@@ -452,17 +445,18 @@ public class Arm extends SubsystemBase {
   // Lifecycle
   @Override
   public void periodic() {
-    if (Controls.getInstance().wantOffsetArmPositive()) offsetArm(armOffsetIncrementRadians);
-    if (Controls.getInstance().wantOffsetArmNegative()) offsetArm(-armOffsetIncrementRadians);
+    if (Controls.getInstance().wantOffsetArmPositive())
+      offsetArm(armOffsetIncrementRadians);
+    if (Controls.getInstance().wantOffsetArmNegative())
+      offsetArm(-armOffsetIncrementRadians);
 
     boolean atStartOfAuto = Robot.getInstance().isAutonomous() && autoTimer.get() < 0.75;
     statorCurrentSignal.refresh();
 
     boolean debouncedHasCoral = coralCurrentDebouncer.calculate(getUndebouncedHasObject());
     boolean debouncedHasAlgae = algaeCurrentDebouncer.calculate(getUndebouncedHasObject());
-    hasObject =
-        atStartOfAuto
-            || (rollerState == RollerState.AlgaeIdle ? debouncedHasAlgae : debouncedHasCoral);
+    hasObject = atStartOfAuto
+        || (rollerState == RollerState.AlgaeIdle ? debouncedHasAlgae : debouncedHasCoral);
 
     if (!isZeroed || !Elevator.getInstance().isZeroed()) {
       return;

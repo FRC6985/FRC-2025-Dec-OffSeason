@@ -87,10 +87,10 @@ public class Elevator extends SubsystemBase {
 
   // Constructor
   private Elevator() {
-    mainMotor = new TalonFX(Constants.CanIds.ELEVATOR_MAIN_MOTOR);
+    mainMotor = new TalonFX(Constants.CanIds.ELEVATOR_MAIN_MOTOR, "canivore");
     mainMotor.getConfigurator().apply(Constants.Elevator.MOTOR_CONFIG);
 
-    followerMotor = new TalonFX(Constants.CanIds.ELEVATOR_FOLLOWER_MOTOR);
+    followerMotor = new TalonFX(Constants.CanIds.ELEVATOR_FOLLOWER_MOTOR, "canivore");
     followerMotor.setControl(new Follower(mainMotor.getDeviceID(), true));
 
     // Initialize interpolation maps
@@ -145,7 +145,7 @@ public class Elevator extends SubsystemBase {
     if (armPositionSignum != armDesiredPositionSignum) {
       interpolationTableInput = 0.0;
     } else if ((Arm.getInstance().getPosition() < 0.0
-            && Arm.getInstance().getDesiredPosition() > Arm.getInstance().getPosition())
+        && Arm.getInstance().getDesiredPosition() > Arm.getInstance().getPosition())
         || (Arm.getInstance().getPosition() > 0.0
             && Arm.getInstance().getDesiredPosition() < Arm.getInstance().getPosition())) {
       interpolationTableInput = Arm.getInstance().getDesiredPosition();
@@ -155,9 +155,8 @@ public class Elevator extends SubsystemBase {
 
     interpolationTableInput = Math.PI - Math.abs(MathUtil.angleModulus(interpolationTableInput));
 
-    double minHeight =
-        (Intake.getInstance().getEffectivePivotState() == Intake.PivotState.Down
-                && Intake.getInstance().isAtSetpoint())
+    double minHeight = (Intake.getInstance().getEffectivePivotState() == Intake.PivotState.Down
+        && Intake.getInstance().isAtSetpoint())
             ? armToElevatorWhenIntakeDown.get(interpolationTableInput)
             : armToElevator.get(interpolationTableInput);
 
@@ -190,8 +189,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isLazierAtSetpoint() {
-    return Math.abs(getHeight() - state.getExtension())
-        < Constants.Elevator.LAZIER_SETPOINT_THRESHOLD;
+    return Math.abs(getHeight() - state.getExtension()) < Constants.Elevator.LAZIER_SETPOINT_THRESHOLD;
   }
 
   public boolean isAtOrAboveSetpoint() {
@@ -208,8 +206,7 @@ public class Elevator extends SubsystemBase {
       degreesAroundReefCenter += 180.0;
     }
 
-    double algaeDirection =
-        Math.toDegrees(Utils.wrapTo0_2PI(Math.toRadians(degreesAroundReefCenter - 30.0)));
+    double algaeDirection = Math.toDegrees(Utils.wrapTo0_2PI(Math.toRadians(degreesAroundReefCenter - 30.0)));
 
     if ((300.0 < algaeDirection && algaeDirection < 360.0)
         || (180.0 < algaeDirection && algaeDirection < 240.0)
